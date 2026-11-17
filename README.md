@@ -1,46 +1,61 @@
-# Aetheria: Heavenly Realms — Premium MMORPG Website
+# Florence Network — Official Minecraft Bedrock Web Store & Server Hub
 
-Website resmi MMORPG bertema **Heavenly Fantasy World** dengan kualitas visual AAA, terinspirasi dari konsep seni dunia surgawi, pulau-pulau melayang, kastil kerajaan marmer emas, pegunungan es mistis, lautan safir, dan lembah para raksasa.
-
----
-
-## 🌟 Fitur Utama Website
-
-1. **4 AI-Generated Cinematic Backgrounds (Ultra HD / 4K Panorama)**:
-   - **Background 1: Heavenly Paradise** (Hero Section) — Istana marmer putih bertabur emas di atas awan surga dengan pulau melayang dan sinar matahari volumetrik.
-   - **Background 2: Celestial Ocean Kingdom** (News & Updates Section) — Lautan safir dan pirus di bawah tebing melayang dengan kuil kuno bercahaya magis.
-   - **Background 3: Divine Frozen Mountain Kingdom** (Why Choose Us Section) — Pegunungan kristal es abadi dengan kastil beku dan siluet ksatria berzirah perak.
-   - **Background 4: Divine RPG Kingdom / Epic World** (Explore World & Footer) — Lembah zamrud purba dengan pohon raksasa, patung kolosal, dan jembatan fantasi.
-
-2. **Komponen & Arsitektur Modern (Next.js App Router)**:
-   - `Header.tsx`: Glassmorphism sticky navbar dengan transisi scroll dinamis, navigasi responsif, pemilih bahasa, dan tombol Discord.
-   - `HeroSection.tsx`: Logo 3D Aetheria dengan permata safir berkilau, status server live, tombol aksi *Play Now*, *Explore World*, dan trailer modal.
-   - `NewsSection.tsx`: Kartu berita horizontal responsif dengan filter kategori (Updates, New Class, Events, Announcements) dan efek zoom hover.
-   - `WhyChooseUs.tsx`: Layout dua kolom editorial dengan artwork vertikal Celestial Knight di kiri dan 6 pilar keunggulan server di kanan.
-   - `FeaturesSection.tsx`: Cuplikan trailer video raid boss titan colossus, tab sistem gameplay (Hunting Grounds, Crafting, Castle Siege, Flight), serta grid 4 kelas heroik.
-   - `ExploreWorld.tsx`: Peta interaktif 4 zona mitologi lengkap dengan tingkat level, elemen, lore peradaban kuno, dan landmark ambient.
-   - `CommunitySection.tsx`: Hub komunitas Discord terintegrasi, papan peringkat guild teratas, cermin unduhan klien game resmi (Direct CDN, Google Drive, Mega, Torrent), dan spesifikasi PC resmi.
-   - `Footer.tsx`: Penutup halaman dengan latar belakang transisi gelap, status server real-time, tautan legalitas, dan tombol kembali ke atas.
-   - `ParticleCanvas.tsx`: Partikel bercahaya (emas & cyan) yang melayang lembut dengan efek atmosfer surga tanpa membebani performa browser.
-
-3. **Design System & Typography**:
-   - **Primary Palette**: Heavenly Blue (`#0B8FCB`), Celestial Cyan (`#28D8E8`), Divine Gold (`#DDBB72`), Cloud White (`#F8FBFF`).
-   - **Secondary Palette**: Deep Ocean (`#063A60`), Midnight Blue (`#061B35`), Royal Purple (`#7664B5`), Dark Glass.
-   - **Typography**: Google Fonts *Cinzel*, *Cormorant Garamond*, *Montserrat*, dan *Poppins*.
+Website resmi dan Web Store terintegrasi untuk **Florence Network (Minecraft Bedrock Server)**. Dibangun menggunakan Next.js App Router, Tailwind CSS, TypeScript, dan sistem integrasi transaksi real-time & Google Sheets / Google Apps Script.
 
 ---
 
-## 🛠️ Menjalankan Project Secara Lokal
+## 🌟 Fitur Utama Website & Store
+
+1. **Sistem Akun & Autentikasi Gamertag Minecraft Bedrock**:
+   - Pendaftaran & login aman menggunakan Gamertag Bedrock resmi.
+   - Sinkronisasi profil avatar gamertag otomatis via Crafatar / Minotar API.
+   - User Dashboard pribadi: melihat riwayat transaksi, status pesanan, gamertag aktif, dan kupon diskon.
+
+2. **Katalog Rank Per-Season & Item Benefit Eksklusif**:
+   - Sistem rank berbasis masa aktif season (bukan lifetime/permanen).
+   - Penjelasan benefit in-game yang rapi: uang in-game, prefix chat, command akses via format chat khusus (contoh: `+heal`, `+fly`, `+feed`).
+   - Tidak membocorkan nama item mentah, melainkan menyajikan benefit eksklusif rank secara rapi dan profesional.
+
+3. **Keranjang Belanja & Checkout Multi-Item**:
+   - Sistem cart drawer interaktif.
+   - Input voucher diskon & catatan khusus order.
+   - Terintegrasi QRIS pembayaran instan otomatis.
+
+4. **Kuitansi / Invoice Digital Resmi (INV-XXXXX)**:
+   - Pelacak status invoice real-time (`/lacak-invoice`).
+   - Fitur cetak & unduh Kuitansi Pembayaran berformat gambar beresolusi tinggi (PNG/Canvas) dengan watermark resmi, stempel status "LUNAS", dan tombol kirim invoice ke WhatsApp Admin secara langsung.
+
+5. **Server Info Real-time**:
+   - **Server IP**: `game-gnl-jh3.raznar.net`
+   - **Port**: `9242`
+   - Fitur salin IP dan Port dengan satu klik.
+
+---
+
+## 🛠️ Cara Menjalankan Project
 
 ```bash
-# Menjalankan development server
+# Install dependencies (jika baru pertama kali di clone)
+npm install
+
+# Jalankan server development
 npm run dev
 
-# Membangun produksi (Optimized Turbopack Build)
+# Build produksi
 npm run build
 
-# Menjalankan server produksi lokal (Port 3000)
+# Jalankan server produksi
 npm run start
 ```
 
-Buka peramban di [http://localhost:3000](http://localhost:3000) untuk menjelajahi website secara langsung.
+Buka peramban di [http://localhost:3000](http://localhost:3000).
+
+---
+
+## 🚀 Push / Upload ke GitHub
+
+Jika sudah memiliki repository kosong di GitHub:
+```bash
+git remote add origin https://github.com/<USERNAME>/<NAMA_REPO>.git
+git push -u origin main
+```
