@@ -162,8 +162,36 @@ function doPost(e) {
 
 function doGet(e) {
   var sheets = setupDatabaseSheets();
-  var action = e.parameter.action;
+  var action = (e && e.parameter) ? e.parameter.action : "";
 
+  // 1. Mengambil Daftar Pembeli Rank Asli dari Spreadsheet
+  if (action === "recent_buyers" || action === "buyers") {
+    var ordersData = sheets.orderSheet.getDataRange().getValues();
+    var buyers = [];
+    // Urutkan dari baris terakhir (terbaru) ke atas
+    for (var m = ordersData.length - 1; m >= 1; m--) {
+      var row = ordersData[m];
+      if (row[1]) { // invoiceId
+        buyers.push({
+          invoiceId: row[1],
+          gamertag: row[2],
+          items: row[3],
+          total: row[4],
+          paymentMethod: row[5],
+          status: row[6],
+          createdAt: row[7] || row[0]
+        });
+        if (buyers.length >= 30) break; // Maksimal 30 data pembeli terbaru
+      }
+    }
+    return ContentService.createTextOutput(JSON.stringify({
+      success: true,
+      buyers: buyers,
+      server: "Florence Network"
+    })).setMimeType(ContentService.MimeType.JSON);
+  }
+
+  // 2. Statistik Server
   if (action === "stats") {
     var totalUsers = Math.max(0, sheets.userSheet.getLastRow() - 1);
     var totalOrders = Math.max(0, sheets.orderSheet.getLastRow() - 1);

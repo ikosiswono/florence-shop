@@ -38,7 +38,6 @@ import {
 } from "lucide-react";
 import { useShop } from "@/context/ShopContext";
 import { CONFIG, PRODUCTS, formatRupiah } from "@/data/products";
-import { MOCK_ONLINE_PLAYERS } from "@/data/whitelist";
 import { Order, Product } from "@/types/shop";
 import InvoicePrintModal from "@/components/InvoicePrintModal";
 import CartDrawer from "@/components/CartDrawer";
@@ -62,12 +61,49 @@ export default function DashboardPage() {
   } = useShop();
 
   const [activeTab, setActiveTab] = useState<
-    "dashboard" | "ranks" | "purchased" | "players" | "settings"
+    "dashboard" | "ranks" | "purchased" | "buyers" | "settings"
   >("dashboard");
 
   const [searchQuery, setSearchQuery] = useState("");
   const [copiedIP, setCopiedIP] = useState(false);
   const [copiedCmd, setCopiedCmd] = useState<string | null>(null);
+
+  // Real Buyers Data (Fetched dynamically from Google Sheets via Apps Script / local store orders)
+  const [spreadsheetBuyers, setSpreadsheetBuyers] = useState<any[]>([]);
+  const [isLoadingBuyers, setIsLoadingBuyers] = useState(false);
+
+  React.useEffect(() => {
+    async function loadSpreadsheetBuyers() {
+      if (!CONFIG.APPS_SCRIPT_URL) return;
+      setIsLoadingBuyers(true);
+      try {
+        const res = await fetch(`${CONFIG.APPS_SCRIPT_URL}?action=recent_buyers`);
+        const json = await res.json();
+        if (json && json.success && Array.isArray(json.buyers)) {
+          setSpreadsheetBuyers(json.buyers);
+        }
+      } catch (err) {
+        console.warn("Apps Script buyers fetch notice:", err);
+      } finally {
+        setIsLoadingBuyers(false);
+      }
+    }
+    loadSpreadsheetBuyers();
+  }, []);
+
+  // List of real verified buyers (Empty if no purchases made yet)
+  const serverBuyers = useMemo(() => {
+    if (spreadsheetBuyers.length > 0) return spreadsheetBuyers;
+    if (typeof window !== "undefined") {
+      try {
+        const localOrders = JSON.parse(localStorage.getItem("florence_orders") || "[]");
+        return localOrders.filter((o: any) => o.status === "COMPLETED");
+      } catch (e) {
+        return [];
+      }
+    }
+    return [];
+  }, [spreadsheetBuyers]);
 
   // Settings Edit Form State
   const [phoneEdit, setPhoneEdit] = useState(currentUser?.phone || "");
@@ -330,15 +366,22 @@ export default function DashboardPage() {
 
               <button
                 type="button"
-                onClick={() => setActiveTab("players")}
-                className={`w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl font-bold transition-all ${
-                  activeTab === "players"
+                onClick={() => setActiveTab("buyers")}
+                className={`w-full flex items-center justify-between px-3.5 py-2.5 rounded-xl font-bold transition-all ${
+                  activeTab === "buyers"
                     ? "bg-gradient-to-r from-red-600/80 to-rose-700/70 text-white shadow-[0_4px_16px_rgba(225,29,72,0.35)]"
                     : "text-slate-400 hover:text-white hover:bg-white/5"
                 }`}
               >
-                <Users className="w-4 h-4 shrink-0" />
-                <span>Friends / Players</span>
+                <div className="flex items-center gap-3">
+                  <CreditCard className="w-4 h-4 shrink-0" />
+                  <span>Pembeli Rank (Live)</span>
+                </div>
+                {serverBuyers.length > 0 && (
+                  <span className="px-1.5 py-0.5 rounded-md bg-emerald-500/30 text-emerald-300 text-[9px] font-mono">
+                    {serverBuyers.length}
+                  </span>
+                )}
               </button>
 
               <button
@@ -355,43 +398,23 @@ export default function DashboardPage() {
               </button>
             </nav>
 
-            {/* Online Players Roster Widget in Sidebar */}
-            <div className="pt-2 border-t border-[#231033] hidden sm:block">
-              <div className="flex items-center justify-between text-[10px] font-mono text-slate-400 uppercase tracking-wider mb-2 px-1">
-                <span>ONLINE PLAYERS</span>
+            {/* Live Server Info Card in Sidebar (No Dummy Data) */}
+            <div className="pt-3 border-t border-[#231033] hidden sm:block space-y-2">
+              <div className="flex items-center justify-between text-[10px] font-mono text-slate-400 uppercase tracking-wider px-1">
+                <span>SERVER BEDROCK</span>
                 <span className="text-emerald-400 font-bold flex items-center gap-1">
                   <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-ping" />
-                  {MOCK_ONLINE_PLAYERS.filter(p => p.isOnline).length}
+                  ONLINE
                 </span>
               </div>
 
-              <div className="space-y-1.5 max-h-44 overflow-y-auto pr-1 scrollbar-none">
-                {MOCK_ONLINE_PLAYERS.map((player) => (
-                  <div
-                    key={player.gamertag}
-                    className="flex items-center justify-between p-1.5 rounded-lg hover:bg-white/5 transition-colors text-xs"
-                  >
-                    <div className="flex items-center gap-2 overflow-hidden">
-                      <div className="w-6 h-6 rounded-md bg-slate-900 border border-slate-700 overflow-hidden shrink-0 flex items-center justify-center">
-                        <Image
-                          src={`https://mc-heads.net/avatar/${encodeURIComponent(player.gamertag)}/24`}
-                          alt={player.gamertag}
-                          width={24}
-                          height={24}
-                          className="object-contain image-rendering-pixelated"
-                          unoptimized
-                        />
-                      </div>
-                      <span className="text-[11px] font-montserrat text-slate-300 truncate max-w-[100px]">
-                        {player.gamertag}
-                      </span>
-                    </div>
-
-                    <span className={`w-1.5 h-1.5 rounded-full shrink-0 ${
-                      player.isOnline ? "bg-emerald-400 shadow-[0_0_6px_#10b981]" : "bg-slate-600"
-                    }`} />
-                  </div>
-                ))}
+              <div className="p-3 rounded-2xl bg-[#150a22] border border-[#2b173d] text-xs font-mono space-y-1">
+                <span className="text-[10px] text-slate-400 block">IP SERVER:</span>
+                <strong className="text-cyan-300 text-[11px] block truncate select-all">{CONFIG.SERVER_IP}</strong>
+                <div className="flex justify-between items-center pt-1 border-t border-white/5 text-[10px]">
+                  <span className="text-slate-400">PORT:</span>
+                  <strong className="text-amber-300 font-bold">{CONFIG.BEDROCK_PORT}</strong>
+                </div>
               </div>
             </div>
 
@@ -834,53 +857,99 @@ export default function DashboardPage() {
           )}
 
           {/* =================================================================
-              CONTENT TAB: PLAYERS ROSTER
+              CONTENT TAB: REAL BUYERS (LIVE FROM GOOGLE SHEETS / SPREADSHEET)
              ================================================================= */}
-          {activeTab === "players" && (
+          {activeTab === "buyers" && (
             <div className="space-y-4 animate-fadeIn">
-              <div className="flex items-center justify-between pb-3 border-b border-[#2b173d]">
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between pb-3 border-b border-[#2b173d] gap-2">
                 <div>
-                  <h3 className="font-cinzel text-lg font-bold text-white">
-                    Daftar Pemain & Rekan Petualang (Florence Bedrock)
+                  <h3 className="font-cinzel text-lg font-bold text-white flex items-center gap-2">
+                    <Receipt className="w-5 h-5 text-amber-400" />
+                    <span>Daftar Pembelian Rank Server</span>
                   </h3>
                   <p className="text-xs text-slate-400">
-                    Status online pemain yang terdaftar di whitelist resmi server.
+                    Data transaksi pembelian rank tersinkronisasi otomatis dengan database Google Spreadsheet.
                   </p>
+                </div>
+
+                <div className="flex items-center gap-2">
+                  <span className="px-3 py-1 rounded-full bg-emerald-500/15 border border-emerald-400/30 text-emerald-300 text-[10px] font-mono font-bold flex items-center gap-1.5">
+                    <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-ping" />
+                    GOOGLE SHEETS SYNC
+                  </span>
                 </div>
               </div>
 
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
-                {MOCK_ONLINE_PLAYERS.map((p) => (
-                  <div
-                    key={p.gamertag}
-                    className="p-3.5 rounded-2xl bg-[#140b22] border border-[#2d1840] flex items-center justify-between"
-                  >
-                    <div className="flex items-center gap-3">
-                      <div className="w-10 h-10 rounded-xl bg-black/60 border border-slate-700 overflow-hidden flex items-center justify-center">
-                        <Image
-                          src={`https://mc-heads.net/avatar/${encodeURIComponent(p.gamertag)}/40`}
-                          alt={p.gamertag}
-                          width={40}
-                          height={40}
-                          className="object-contain image-rendering-pixelated"
-                          unoptimized
-                        />
-                      </div>
-                      <div>
-                        <strong className="text-xs text-white block">{p.gamertag}</strong>
-                        <span className="text-[10px] text-amber-300 font-montserrat">{p.rank}</span>
-                      </div>
-                    </div>
-
-                    <div className="flex items-center gap-1.5">
-                      <span className={`w-2 h-2 rounded-full ${p.isOnline ? "bg-emerald-400" : "bg-slate-600"}`} />
-                      <span className="text-[10px] text-slate-400 uppercase font-mono">
-                        {p.isOnline ? "Online" : "Offline"}
-                      </span>
-                    </div>
+              {serverBuyers.length === 0 ? (
+                <div className="text-center py-16 bg-[#130b20] rounded-3xl border border-[#2b173d] p-6 sm:p-10 space-y-3">
+                  <div className="w-16 h-16 rounded-2xl bg-amber-400/10 border border-amber-300/30 flex items-center justify-center text-amber-300 mx-auto">
+                    <Receipt className="w-8 h-8" />
                   </div>
-                ))}
-              </div>
+                  <h4 className="font-cinzel text-base font-bold text-white">
+                    Belum Ada Riwayat Pembelian Rank di Season 5
+                  </h4>
+                  <p className="text-xs text-slate-400 max-w-md mx-auto leading-relaxed">
+                    Tidak ada data dummy. Ketika ada pemain yang melakukan pembelian rank melalui Web Store, data transaksi akan otomatis masuk ke Google Spreadsheet dan langsung tampil pada daftar ini secara real-time.
+                  </p>
+                  <div className="pt-2">
+                    <Link
+                      href="/#katalog"
+                      className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-gradient-to-r from-red-600 to-rose-700 text-white font-montserrat font-bold text-xs shadow-md hover:brightness-110 transition-all uppercase tracking-wider"
+                    >
+                      <Sparkles className="w-4 h-4" />
+                      <span>Beli Rank di Web Store</span>
+                    </Link>
+                  </div>
+                </div>
+              ) : (
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
+                  {serverBuyers.map((buyer: any, idx: number) => {
+                    const gt = buyer.gamertag || buyer.username || "Player";
+                    const itemsText = buyer.items 
+                      ? (Array.isArray(buyer.items) ? buyer.items.map((i: any) => `${i.name} (x${i.quantity})`).join(", ") : buyer.items)
+                      : "Rank Server";
+                    const formattedDate = buyer.createdAt 
+                      ? new Date(buyer.createdAt).toLocaleDateString("id-ID", { dateStyle: "medium" })
+                      : "Baru saja";
+                    
+                    return (
+                      <div
+                        key={buyer.invoiceId || idx}
+                        className="p-4 rounded-2xl bg-[#140b22] border border-[#2d1840] hover:border-amber-400/40 transition-all flex flex-col justify-between space-y-3 shadow-md"
+                      >
+                        <div className="flex items-center gap-3">
+                          <div className="w-11 h-11 rounded-xl bg-black/60 border border-amber-300/50 overflow-hidden flex items-center justify-center shrink-0">
+                            <Image
+                              src={`https://mc-heads.net/avatar/${encodeURIComponent(gt)}/44`}
+                              alt={gt}
+                              width={44}
+                              height={44}
+                              className="object-contain image-rendering-pixelated"
+                              unoptimized
+                            />
+                          </div>
+                          <div className="overflow-hidden">
+                            <strong className="text-xs text-white block truncate">{gt}</strong>
+                            <span className="text-[11px] text-amber-300 font-cinzel font-bold block truncate">
+                              {itemsText}
+                            </span>
+                            <span className="text-[9px] font-mono text-cyan-300 block">
+                              {buyer.invoiceId || "INV-VERIFIED"}
+                            </span>
+                          </div>
+                        </div>
+
+                        <div className="flex items-center justify-between pt-2 border-t border-white/5 text-[10px]">
+                          <span className="text-slate-400 font-mono">{formattedDate}</span>
+                          <span className="px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 border border-emerald-400/30 font-bold uppercase text-[9px]">
+                            ✓ TERCATAT SPREADSHEET
+                          </span>
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              )}
             </div>
           )}
 

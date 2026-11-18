@@ -27,7 +27,7 @@ Website resmi dan Web Store terintegrasi untuk **Florence Network (Minecraft Bed
 
 5. **Server Info Real-time**:
    - **Server IP**: `game-gnl-jh3.raznar.net`
-   - **Port**: `9242`
+   - **Port**: `19242`
    - Fitur salin IP dan Port dengan satu klik.
 
 ---

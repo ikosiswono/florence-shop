@@ -1,7 +1,7 @@
 /**
  * DAFTAR RESMI GAMERTAG MINECRAFT BEDROCK (WHITELIST SYSTEM)
  * -------------------------------------------------------------
- * Anda dapat menambahkan atau memperbarui nama-nama pemain yang sah di sini.
+ * Anda dapat menambahkan nama-nama pemain yang sah di sini.
  * Hanya Gamertag yang terdaftar yang dapat melakukan registrasi akun di Web Store.
  */
 
@@ -11,27 +11,18 @@ export interface WhitelistEntry {
   notes?: string;
 }
 
-// Daftar Gamertag Pemain yang Sah (Whitelist)
-// Pemilik server dapat mengirimkan nama-nama tambahan kapan saja dan akan langsung dimasukkan ke sini.
+// Daftar Gamertag Pemain yang Sah (Whitelist Resmi Server)
+// Nama-nama yang Anda kirimkan akan disusun dan ditambahkan di sini.
 export const AUTHORIZED_GAMERTAGS: WhitelistEntry[] = [
-  // Admin & Server Founders
-  { gamertag: "FlorenceAdmin", role: "admin", notes: "Founder Florence Network" },
-  { gamertag: "ikosiswono", role: "owner", notes: "Server Owner" },
-  { gamertag: "Marcel", role: "admin", notes: "System Administrator" },
-  
-  // Contoh Pemain Terdaftar / Batch Pertama (Akan disesuaikan dengan daftar yang Anda kirim)
-  { gamertag: "AlexRyan", role: "vip", notes: "Pemain Aktif Season 5" },
-  { gamertag: "EstherHoward", role: "member", notes: "Bedrock Player" },
-  { gamertag: "JacobJones", role: "vip", notes: "Bedrock Player" },
-  { gamertag: "CodyFisher", role: "member", notes: "Bedrock Player" },
-  { gamertag: "AlezRayhan", role: "vip", notes: "Bedrock Player" },
-  { gamertag: "Steve", role: "member", notes: "Default Bedrock Player" },
-  { gamertag: "Alex", role: "member", notes: "Default Bedrock Player" }
+  // Server Founders & Admins
+  { gamertag: "ikosiswono", role: "owner", notes: "Owner Florence Network" },
+  { gamertag: "FlorenceAdmin", role: "admin", notes: "Admin Florence Network" }
+  // >> Nama-nama pemain baru dari Anda akan dimasukkan di sini <<
 ];
 
 // Opsi Mode Whitelist:
-// "STRICT" = Hanya nama yang terdaftar di AUTHORIZED_GAMERTAGS yang boleh registrasi.
-// "FLEXIBLE" = Gamertag yang valid (3-16 karakter, format Bedrock) diizinkan, namun nama di AUTHORIZED_GAMERTAGS mendapat verifikasi instan.
+// Jika "STRICT", hanya nama yang tertera di AUTHORIZED_GAMERTAGS yang boleh registrasi.
+// Jika "FLEXIBLE", format Gamertag Bedrock (3-16 karakter) diperbolehkan registrasi mandiri.
 export const WHITELIST_MODE: "STRICT" | "FLEXIBLE" = "STRICT";
 
 /**
@@ -51,7 +42,7 @@ export function checkGamertagAuthorization(gamertag: string): {
     };
   }
 
-  // Format valid Xbox Live Bedrock Gamertag (huruf, angka, dan spasi tunggal)
+  // Format valid Xbox Live Bedrock Gamertag (huruf, angka, garis bawah, dan spasi tunggal)
   const bedrockRegex = /^[a-zA-Z0-9_ ]+$/;
   if (!bedrockRegex.test(clean)) {
     return {
@@ -68,7 +59,7 @@ export function checkGamertagAuthorization(gamertag: string): {
     if (!found) {
       return {
         allowed: false,
-        reason: `Gamertag "${clean}" belum terdaftar di whitelist resmi server. Hubungi Admin Florence Network untuk verifikasi nama akun Anda.`
+        reason: `Gamertag "${clean}" belum terdaftar di whitelist resmi server. Hubungi Admin Florence Network untuk mendaftarkan nama akun Anda ke sistem whitelist.`
       };
     }
   }
@@ -78,16 +69,3 @@ export function checkGamertagAuthorization(gamertag: string): {
     entry: found
   };
 }
-
-/**
- * Daftar Pemain Online Simulasi Real-Time untuk Widget Dashboard
- */
-export const MOCK_ONLINE_PLAYERS = [
-  { gamertag: "ikosiswono", rank: "Owner", isOnline: true },
-  { gamertag: "FlorenceAdmin", rank: "Admin", isOnline: true },
-  { gamertag: "AlexRyan", rank: "Florence Monarch", isOnline: true },
-  { gamertag: "EstherHoward", rank: "Rank Diamond", isOnline: true },
-  { gamertag: "JacobJones", rank: "Rank VIP", isOnline: true },
-  { gamertag: "CodyFisher", rank: "Rank Gold", isOnline: false },
-  { gamertag: "AlezRayhan", rank: "Rank Nether", isOnline: true }
-];
