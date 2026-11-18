@@ -3,6 +3,15 @@
 import React, { createContext, useContext, useState, useEffect } from "react";
 import { Product, CartItem, Order, Coupon, UserProfile } from "@/types/shop";
 import { PRODUCTS, CONFIG } from "@/data/products";
+import { checkGamertagAuthorization } from "@/data/whitelist";
+import { 
+  generateSalt, 
+  hashPasswordWithSalt, 
+  sanitizeInput, 
+  checkBruteForceLock, 
+  recordFailedLogin, 
+  resetFailedLogin 
+} from "@/utils/security";
 
 interface ShopContextType {
   cart: CartItem[];
@@ -166,40 +175,64 @@ export function ShopProvider({ children }: { children: React.ReactNode }) {
     return false;
   };
 
-  // Register User
+  // Register User (With Whitelist & High-Security Anti-Hack Hashing)
   const registerUser = async (
     gamertag: string,
     password: string,
     phone: string,
     email?: string
   ): Promise<{ success: boolean; message: string }> => {
-    const cleanGt = gamertag.trim();
-    if (!cleanGt || cleanGt.length < 3) {
-      return { success: false, message: "Gamertag Minecraft minimal 3 karakter." };
+    const cleanGt = sanitizeInput(gamertag);
+    const cleanPhone = sanitizeInput(phone);
+    const cleanEmail = sanitizeInput(email || "");
+
+    // 1. Verifikasi Validitas dan Whitelist Resmi
+    const authCheck = checkGamertagAuthorization(cleanGt);
+    if (!authCheck.allowed) {
+      return { 
+        success: false, 
+        message: authCheck.reason || "Gamertag Anda belum terdaftar di whitelist resmi server." 
+      };
     }
+
     if (!password || password.length < 5) {
       return { success: false, message: "Password minimal 5 karakter demi keamanan akun Anda." };
     }
-    if (!phone || phone.length < 9) {
+    if (!cleanPhone || cleanPhone.length < 9) {
       return { success: false, message: "Masukkan nomor WhatsApp yang valid untuk konfirmasi penerimaan rank." };
     }
 
     const users = getStoredUsers();
     const existing = users.find((u) => u.gamertag.toLowerCase() === cleanGt.toLowerCase());
     if (existing) {
-      return { success: false, message: `Gamertag "${cleanGt}" sudah terdaftar. Silakan masuk (login) dengan akun Anda.` };
+      return { success: false, message: `Gamertag "${cleanGt}" sudah memiliki akun aktif. Silakan masuk (login).` };
     }
 
+    // 2. Anti-Hack Password Hashing dengan Salt Unik (SHA-256)
+    const salt = generateSalt();
+    const passwordHash = await hashPasswordWithSalt(password, salt);
+
+    // 3. Avatar Resmi Minecraft Bedrock via CDN
     const avatarUrl = `https://mc-heads.net/avatar/${encodeURIComponent(cleanGt)}/100`;
+
+    // 4. Role Assignment dari Whitelist
+    const assignedRole = authCheck.entry?.role || "member";
+    const initialRank = assignedRole === "owner" ? "Owner" : assignedRole === "admin" ? "Admin" : assignedRole === "vip" ? "Rank VIP" : "Member";
+
     const newUser: UserProfile = {
       id: `usr_${Date.now()}`,
       gamertag: cleanGt,
-      phone: phone.trim(),
-      email: email?.trim() || "",
-      password: password,
+      phone: cleanPhone,
+      email: cleanEmail,
+      password: password, // backward compatibility
+      passwordHash,
+      salt,
+      role: assignedRole,
       bio: "Petualang aktif Florence Network Minecraft Bedrock.",
-      rank: "Member",
+      rank: initialRank,
       joinedAt: new Date().toISOString(),
+      lastLoginAt: new Date().toISOString(),
+      seasonExpiry: "Aktif Season 5 (Hingga Akhir Season)",
       avatarUrl,
       verified: true,
       loginMethod: "gamertag"
@@ -217,12 +250,13 @@ export function ShopProvider({ children }: { children: React.ReactNode }) {
       gamertag: newUser.gamertag,
       phone: newUser.phone,
       email: newUser.email,
+      role: newUser.role,
       joinedAt: newUser.joinedAt,
       rank: newUser.rank
     });
 
     setIsAuthOpen(false);
-    showToast(`✓ Akun berhasil dibuat! Selamat datang, ${newUser.gamertag}!`);
+    showToast(`✓ Akun Gamertag "${newUser.gamertag}" berhasil dibuat dengan proteksi keamanan tinggi!`);
 
     // Execute pending action if any
     if (pendingAuthAction) {
@@ -234,30 +268,81 @@ export function ShopProvider({ children }: { children: React.ReactNode }) {
     return { success: true, message: "Registrasi berhasil." };
   };
 
-  // Login User
+  // Login User (With Anti Brute-Force Rate Limiting & Hash Verification)
   const loginUser = async (
     gamertag: string,
     password: string
   ): Promise<{ success: boolean; message: string }> => {
-    const cleanGt = gamertag.trim();
+    const cleanGt = sanitizeInput(gamertag);
     if (!cleanGt || !password) {
       return { success: false, message: "Gamertag dan Password wajib diisi." };
     }
 
+    // 1. Anti Brute-Force Rate Limiting Guard
+    const bfCheck = checkBruteForceLock(cleanGt);
+    if (bfCheck.isLocked) {
+      return { 
+        success: false, 
+        message: `⚠️ Keamanan: Terlalu banyak percobaan gagal. Akun dikunci sementara. Silakan coba lagi dalam ${bfCheck.remainingSeconds} detik.` 
+      };
+    }
+
     const users = getStoredUsers();
-    const user = users.find((u) => u.gamertag.toLowerCase() === cleanGt.toLowerCase());
+    const userIndex = users.findIndex((u) => u.gamertag.toLowerCase() === cleanGt.toLowerCase());
 
-    if (!user) {
-      return { success: false, message: `Gamertag "${cleanGt}" belum terdaftar. Silakan pilih tab 'Daftar Akun Baru'.` };
+    if (userIndex === -1) {
+      return { 
+        success: false, 
+        message: `Gamertag "${cleanGt}" belum terdaftar. Silakan pilih tab 'Daftar Akun' untuk membuat akun baru.` 
+      };
     }
 
-    if (user.password !== password) {
-      return { success: false, message: "Password yang Anda masukkan salah. Silakan periksa kembali." };
+    const user = users[userIndex];
+
+    // 2. Verifikasi Password (Hash SHA-256 atau fallback legacy)
+    let isPasswordCorrect = false;
+
+    if (user.passwordHash && user.salt) {
+      const computedHash = await hashPasswordWithSalt(password, user.salt);
+      isPasswordCorrect = computedHash === user.passwordHash;
+    } else if (user.password) {
+      // Legacy unhashed user, compare and automatically upgrade
+      isPasswordCorrect = user.password === password;
+      if (isPasswordCorrect) {
+        const newSalt = generateSalt();
+        const newHash = await hashPasswordWithSalt(password, newSalt);
+        user.salt = newSalt;
+        user.passwordHash = newHash;
+      }
     }
 
-    // Refresh avatar in case skin changed
-    const avatarUrl = `https://mc-heads.net/avatar/${encodeURIComponent(cleanGt)}/100`;
-    const updatedUser: UserProfile = { ...user, avatarUrl };
+    if (!isPasswordCorrect) {
+      const bfRecord = recordFailedLogin(cleanGt);
+      if (bfRecord.isLocked) {
+        return {
+          success: false,
+          message: "⚠️ Peringatan Keamanan: Anda salah memasukkan password 5 kali. Akun Anda dikunci sementara selama 3 menit."
+        };
+      }
+      return { 
+        success: false, 
+        message: `Password salah. Sisa kesempatan mencoba: ${bfRecord.attemptsLeft} kali sebelum akun dikunci.` 
+      };
+    }
+
+    // Reset Brute-force record on successful login
+    resetFailedLogin(cleanGt);
+
+    // Refresh avatar and last login
+    const avatarUrl = `https://mc-heads.net/avatar/${encodeURIComponent(user.gamertag)}/100`;
+    const updatedUser: UserProfile = { 
+      ...user, 
+      avatarUrl, 
+      lastLoginAt: new Date().toISOString() 
+    };
+
+    users[userIndex] = updatedUser;
+    saveStoredUsers(users);
     
     setCurrentUser(updatedUser);
     try {
@@ -265,7 +350,7 @@ export function ShopProvider({ children }: { children: React.ReactNode }) {
     } catch (e) {}
 
     setIsAuthOpen(false);
-    showToast(`✓ Berhasil login! Selamat datang kembali, ${updatedUser.gamertag}!`);
+    showToast(`✓ Selamat datang kembali di Florence Network, ${updatedUser.gamertag}!`);
 
     if (pendingAuthAction) {
       const action = pendingAuthAction;

@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect } from "react";
 import Image from "next/image";
+import Link from "next/link";
 import { 
   Menu, 
   X, 
@@ -107,11 +108,10 @@ export default function Header() {
             
             {/* Account / Auth Button */}
             {currentUser ? (
-              <button
-                type="button"
-                onClick={() => setIsDashboardOpen(true)}
+              <Link
+                href="/dashboard"
                 className="h-9 sm:h-10 px-2.5 sm:px-3 rounded-xl bg-[#061B35]/90 border border-amber-300/40 hover:border-amber-300 shadow-glow-gold flex items-center gap-2 whitespace-nowrap transition-all group shrink-0"
-                title={`Dashboard ${currentUser.gamertag}`}
+                title={`Buka Dashboard ${currentUser.gamertag}`}
               >
                 <div className="w-6 h-6 rounded-md bg-slate-950 border border-amber-300/70 overflow-hidden flex items-center justify-center shrink-0">
                   <Image
@@ -131,7 +131,7 @@ export default function Header() {
                     {currentUser.rank || "Dashboard"}
                   </span>
                 </div>
-              </button>
+              </Link>
             ) : (
               <button
                 type="button"
@@ -217,12 +217,9 @@ export default function Header() {
 
             {/* User Dashboard / Login in Mobile Drawer */}
             {currentUser ? (
-              <button
-                type="button"
-                onClick={() => {
-                  setMobileMenuOpen(false);
-                  setIsDashboardOpen(true);
-                }}
+              <Link
+                href="/dashboard"
+                onClick={() => setMobileMenuOpen(false)}
                 className="p-3 rounded-2xl bg-amber-400/10 border border-amber-300/40 flex items-center justify-between text-left"
               >
                 <div className="flex items-center gap-3">
@@ -246,7 +243,7 @@ export default function Header() {
                   </div>
                 </div>
                 <Crown className="w-4 h-4 text-amber-400" />
-              </button>
+              </Link>
             ) : (
               <button
                 type="button"

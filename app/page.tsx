@@ -1,6 +1,5 @@
 "use client";
 
-import { ShopProvider } from "@/context/ShopContext";
 import Header from "@/components/Header";
 import HeroSection from "@/components/HeroSection";
 import ShopCatalog from "@/components/ShopCatalog";
@@ -17,45 +16,41 @@ import UserDashboard from "@/components/UserDashboard";
 import InvoicePrintModal from "@/components/InvoicePrintModal";
 import MobileBottomNav from "@/components/MobileBottomNav";
 import FloatingWhatsApp from "@/components/FloatingWhatsApp";
-import ToastNotification from "@/components/ToastNotification";
 
 export default function Home() {
   return (
-    <ShopProvider>
-      <main className="relative min-h-screen bg-[#041022] overflow-x-hidden pb-16 md:pb-0">
-        {/* Sticky Header with Cart Counter */}
-        <Header />
+    <main className="relative min-h-screen bg-[#041022] overflow-x-hidden pb-16 md:pb-0">
+      {/* Sticky Header with Cart Counter */}
+      <Header />
 
-        {/* Hero Section — Background 1 */}
-        <HeroSection />
+      {/* Hero Section — Background 1 */}
+      <HeroSection />
 
-        {/* 12 Rank Shop Catalog — Background 2 */}
-        <ShopCatalog />
+      {/* 12 Rank Shop Catalog — Background 2 */}
+      <ShopCatalog />
 
-        {/* Why Choose Us & Bedrock Information — Background 3 */}
-        <WhyChooseUs />
+      {/* Why Choose Us & Bedrock Information — Background 3 */}
+      <WhyChooseUs />
 
-        {/* Community, Connect Guide & Support — Background 4 */}
-        <CommunitySection />
+      {/* Community, Connect Guide & Support — Background 4 */}
+      <CommunitySection />
 
-        {/* Footer */}
-        <Footer />
+      {/* Footer */}
+      <Footer />
 
-        {/* Modals & Interactive Overlays */}
-        <CartDrawer />
-        <CheckoutModal />
-        <PaymentModal />
-        <SuccessModal />
-        <InvoiceTracker />
-        <AuthModal />
-        <UserDashboard />
-        <InvoicePrintModal />
-        
-        {/* Mobile Navigation Dock & Widgets */}
-        <MobileBottomNav />
-        <FloatingWhatsApp />
-        <ToastNotification />
-      </main>
-    </ShopProvider>
+      {/* Modals & Interactive Overlays */}
+      <CartDrawer />
+      <CheckoutModal />
+      <PaymentModal />
+      <SuccessModal />
+      <InvoiceTracker />
+      <AuthModal />
+      <UserDashboard />
+      <InvoicePrintModal />
+      
+      {/* Mobile Navigation Dock & Widgets */}
+      <MobileBottomNav />
+      <FloatingWhatsApp />
+    </main>
   );
 }

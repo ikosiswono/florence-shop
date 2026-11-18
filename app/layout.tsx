@@ -1,6 +1,7 @@
 import type { Metadata, Viewport } from "next";
 import "./globals.css";
 import ParticleCanvas from "@/components/ParticleCanvas";
+import Providers from "@/components/Providers";
 
 export const metadata: Metadata = {
   metadataBase: new URL("https://play.florenceshop.net"),
@@ -58,7 +59,9 @@ export default function RootLayout({
       </head>
       <body className="bg-[#041022] text-[#F8FBFF] antialiased selection:bg-cyan-500 selection:text-slate-950 min-h-screen relative">
         <ParticleCanvas />
-        {children}
+        <Providers>
+          {children}
+        </Providers>
       </body>
     </html>
   );

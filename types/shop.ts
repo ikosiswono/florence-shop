@@ -40,9 +40,14 @@ export interface UserProfile {
   phone: string;
   email?: string;
   password?: string;
+  passwordHash?: string;
+  salt?: string;
+  role?: "member" | "vip" | "moderator" | "admin" | "owner";
   bio?: string;
   rank?: string;
   joinedAt: string;
+  lastLoginAt?: string;
+  seasonExpiry?: string;
   avatarUrl: string;
   verified: boolean;
   loginMethod: "gamertag" | "google";

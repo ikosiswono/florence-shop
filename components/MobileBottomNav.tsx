@@ -2,6 +2,7 @@
 
 import React from "react";
 import Image from "next/image";
+import Link from "next/link";
 import { 
   Home, 
   ShoppingBag, 
@@ -61,9 +62,8 @@ export default function MobileBottomNav() {
 
       {/* User Dashboard or Login */}
       {currentUser ? (
-        <button
-          type="button"
-          onClick={() => setIsDashboardOpen(true)}
+        <Link
+          href="/dashboard"
           className="flex flex-col items-center gap-1 text-[10px] font-montserrat text-cyan-300 transition-colors"
         >
           <div className="w-4 h-4 rounded-full overflow-hidden border border-amber-300/80">
@@ -77,7 +77,7 @@ export default function MobileBottomNav() {
             />
           </div>
           <span className="truncate max-w-[55px] font-bold">{currentUser.gamertag}</span>
-        </button>
+        </Link>
       ) : (
         <button
           type="button"

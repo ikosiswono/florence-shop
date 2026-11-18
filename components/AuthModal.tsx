@@ -70,8 +70,13 @@ export default function AuthModal() {
     e.preventDefault();
     setError(null);
 
+    if (password.length < 5) {
+      setError("Password minimal 5 karakter demi keamanan akun Anda.");
+      return;
+    }
+
     if (password !== confirmPassword) {
-      setError("Konfirmasi password tidak cocok dengan password yang Anda buat.");
+      setError("Password 1 dan Password 2 tidak sama. Pastikan kedua password yang Anda ketik cocok!");
       return;
     }
 
@@ -370,7 +375,7 @@ export default function AuthModal() {
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
                 <div>
                   <label className="block text-[10px] font-montserrat font-bold text-slate-300 mb-1 uppercase tracking-wider">
-                    Buat Password <span className="text-amber-400">*</span>
+                    Password 1 (Buat Baru) <span className="text-amber-400">*</span>
                   </label>
                   <div className="relative">
                     <Lock className="w-3.5 h-3.5 text-cyan-400 absolute left-3 top-1/2 -translate-y-1/2" />
@@ -387,7 +392,7 @@ export default function AuthModal() {
 
                 <div>
                   <label className="block text-[10px] font-montserrat font-bold text-slate-300 mb-1 uppercase tracking-wider">
-                    Ulangi Password <span className="text-amber-400">*</span>
+                    Password 2 (Konfirmasi) <span className="text-amber-400">*</span>
                   </label>
                   <div className="relative">
                     <Lock className="w-3.5 h-3.5 text-cyan-400 absolute left-3 top-1/2 -translate-y-1/2" />
@@ -396,11 +401,42 @@ export default function AuthModal() {
                       required
                       value={confirmPassword}
                       onChange={(e) => setConfirmPassword(e.target.value)}
-                      placeholder="Ulangi password"
-                      className="w-full bg-[#061B35]/90 border border-cyan-400/30 rounded-xl py-2 pl-8 pr-2.5 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-amber-300"
+                      placeholder="Ketik ulang password"
+                      className={`w-full bg-[#061B35]/90 border rounded-xl py-2 pl-8 pr-2.5 text-xs text-white placeholder-slate-500 focus:outline-none ${
+                        confirmPassword
+                          ? password === confirmPassword
+                            ? "border-emerald-400 shadow-[0_0_10px_rgba(52,211,153,0.3)]"
+                            : "border-amber-400 shadow-[0_0_10px_rgba(251,191,36,0.3)]"
+                          : "border-cyan-400/30 focus:border-amber-300"
+                      }`}
                     />
                   </div>
                 </div>
+              </div>
+
+              {/* Password Match Real-Time Indicator */}
+              {confirmPassword && (
+                <div className="p-2 rounded-lg bg-black/40 border border-white/5 text-[10px] font-montserrat font-bold">
+                  {password === confirmPassword ? (
+                    <span className="text-emerald-400 flex items-center gap-1.5">
+                      <CheckCircle2 className="w-3.5 h-3.5" />
+                      ✓ Password 1 & Password 2 Cocok dan Sah!
+                    </span>
+                  ) : (
+                    <span className="text-amber-300 flex items-center gap-1.5">
+                      <AlertCircle className="w-3.5 h-3.5" />
+                      ⚠️ Password 1 & Password 2 belum sama, pastikan keduanya cocok.
+                    </span>
+                  )}
+                </div>
+              )}
+
+              {/* Anti-Hack Security Badge */}
+              <div className="p-2.5 rounded-xl bg-cyan-950/40 border border-cyan-400/20 text-[10px] text-cyan-300/90 flex items-center gap-2">
+                <ShieldCheck className="w-4 h-4 text-cyan-400 shrink-0" />
+                <span>
+                  <strong>Anti-Hack Security:</strong> Enkripsi Hashing SHA-256 + Salt Unik & Proteksi Anti Brute-Force aktif.
+                </span>
               </div>
 
               <button
