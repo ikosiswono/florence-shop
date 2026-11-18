@@ -14,6 +14,7 @@ export interface WhitelistEntry {
 // Daftar Gamertag Pemain yang Sah (Whitelist Resmi Server Florence Network)
 export const AUTHORIZED_GAMERTAGS: WhitelistEntry[] = [
   // Server Leadership & Administration
+  { gamertag: "marcellnw", role: "owner", notes: "Server Owner & Head Administrator" },
   { gamertag: "ikosiswono", role: "owner", notes: "Server Owner" },
   { gamertag: "FlorenceAdmin", role: "admin", notes: "Server Administrator" },
 

@@ -28,10 +28,12 @@ export interface Order {
   couponCode?: string;
   total: number;
   paymentMethod: "qris" | "dana" | "gopay";
-  status: "PENDING" | "PAID" | "COMPLETED";
+  status: "PENDING" | "PAID" | "COMPLETED" | "REJECTED";
   createdAt: string;
   command: string;
   userPhone?: string;
+  approvedAt?: string;
+  approvedBy?: string;
 }
 
 export interface UserProfile {

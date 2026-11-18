@@ -73,6 +73,13 @@ interface ShopContextType {
   // Toast
   toast: string | null;
   showToast: (msg: string) => void;
+
+  // Admin Operations
+  adminApproveOrder: (invoiceId: string) => Promise<{ success: boolean; message: string }>;
+  adminRejectOrder: (invoiceId: string) => Promise<{ success: boolean; message: string }>;
+  adminUpdatePlayerRank: (gamertag: string, rank: string) => Promise<{ success: boolean; message: string }>;
+  getAllOrders: () => Order[];
+  getAllUsers: () => UserProfile[];
 }
 
 const ShopContext = createContext<ShopContextType | undefined>(undefined);
@@ -627,6 +634,120 @@ export function ShopProvider({ children }: { children: React.ReactNode }) {
     setIsSuccessOpen(true);
   };
 
+  // Admin Functions
+  const getAllOrders = (): Order[] => {
+    try {
+      const raw = localStorage.getItem("florence_orders");
+      return raw ? JSON.parse(raw) : [];
+    } catch (e) {
+      return [];
+    }
+  };
+
+  const getAllUsers = (): UserProfile[] => {
+    return getStoredUsers();
+  };
+
+  const adminApproveOrder = async (invoiceId: string): Promise<{ success: boolean; message: string }> => {
+    const orders = getAllOrders();
+    const orderIndex = orders.findIndex((o) => o.invoiceId === invoiceId);
+    if (orderIndex === -1) {
+      return { success: false, message: "Pesanan tidak ditemukan." };
+    }
+
+    const order = orders[orderIndex];
+    order.status = "COMPLETED";
+    order.approvedAt = new Date().toISOString();
+    order.approvedBy = "marcellnw";
+    orders[orderIndex] = order;
+
+    try {
+      localStorage.setItem("florence_orders", JSON.stringify(orders));
+      setOrderHistory(orders);
+    } catch (e) {}
+
+    // Find buyer and update their rank
+    if (order.items && order.items.length > 0) {
+      const firstRank = order.items[0].name;
+      const users = getStoredUsers();
+      const userIndex = users.findIndex(
+        (u) => u.gamertag.toLowerCase() === order.username.toLowerCase()
+      );
+      if (userIndex !== -1) {
+        users[userIndex].rank = firstRank;
+        saveStoredUsers(users);
+
+        if (currentUser && currentUser.gamertag.toLowerCase() === order.username.toLowerCase()) {
+          const updatedCurrentUser = { ...currentUser, rank: firstRank };
+          setCurrentUser(updatedCurrentUser);
+          try {
+            localStorage.setItem("florence_current_user", JSON.stringify(updatedCurrentUser));
+          } catch (e) {}
+        }
+      }
+    }
+
+    // Sync to Google Apps Script
+    syncToAppsScript("admin_acc_order", {
+      invoiceId: order.invoiceId,
+      gamertag: order.username,
+      status: "COMPLETED",
+      approvedBy: "marcellnw",
+      approvedAt: order.approvedAt
+    });
+
+    showToast(`✓ Pesanan ${order.invoiceId} berhasil di-ACC resmi oleh Admin!`);
+    return { success: true, message: "Pesanan berhasil disetujui (ACC)." };
+  };
+
+  const adminRejectOrder = async (invoiceId: string): Promise<{ success: boolean; message: string }> => {
+    const orders = getAllOrders();
+    const orderIndex = orders.findIndex((o) => o.invoiceId === invoiceId);
+    if (orderIndex === -1) {
+      return { success: false, message: "Pesanan tidak ditemukan." };
+    }
+
+    const order = orders[orderIndex];
+    order.status = "REJECTED";
+    orders[orderIndex] = order;
+
+    try {
+      localStorage.setItem("florence_orders", JSON.stringify(orders));
+      setOrderHistory(orders);
+    } catch (e) {}
+
+    syncToAppsScript("admin_reject_order", {
+      invoiceId: order.invoiceId,
+      gamertag: order.username,
+      status: "REJECTED"
+    });
+
+    showToast(`Pesanan ${order.invoiceId} ditolak.`);
+    return { success: true, message: "Pesanan telah ditolak." };
+  };
+
+  const adminUpdatePlayerRank = async (gamertag: string, rank: string): Promise<{ success: boolean; message: string }> => {
+    const users = getStoredUsers();
+    const userIndex = users.findIndex((u) => u.gamertag.toLowerCase() === gamertag.toLowerCase());
+    if (userIndex === -1) {
+      return { success: false, message: `Pemain "${gamertag}" tidak ditemukan.` };
+    }
+
+    users[userIndex].rank = rank;
+    saveStoredUsers(users);
+
+    if (currentUser && currentUser.gamertag.toLowerCase() === gamertag.toLowerCase()) {
+      const updatedCurrentUser = { ...currentUser, rank };
+      setCurrentUser(updatedCurrentUser);
+      try {
+        localStorage.setItem("florence_current_user", JSON.stringify(updatedCurrentUser));
+      } catch (e) {}
+    }
+
+    showToast(`✓ Rank ${gamertag} diubah menjadi "${rank}"!`);
+    return { success: true, message: `Rank berhasil diubah ke ${rank}.` };
+  };
+
   return (
     <ShopContext.Provider
       value={{
@@ -675,6 +796,11 @@ export function ShopProvider({ children }: { children: React.ReactNode }) {
         buyNow,
         toast,
         showToast,
+        adminApproveOrder,
+        adminRejectOrder,
+        adminUpdatePlayerRank,
+        getAllOrders,
+        getAllUsers,
       }}
     >
       {children}
