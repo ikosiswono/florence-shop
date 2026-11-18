@@ -1,14 +1,10 @@
 "use client";
 
-import React, { useState } from "react";
+import React from "react";
 import { 
   Check, 
-  Copy, 
   MessageCircle, 
   ThumbsUp, 
-  ShieldCheck, 
-  Terminal,
-  Sparkles,
   Receipt
 } from "lucide-react";
 import { useShop } from "@/context/ShopContext";
@@ -19,23 +15,14 @@ export default function SuccessModal() {
     isSuccessOpen, 
     setIsSuccessOpen, 
     activeOrder, 
-    showToast,
     setSelectedInvoice,
     setIsInvoicePrintOpen
   } = useShop();
-  const [copiedCmd, setCopiedCmd] = useState(false);
 
   if (!isSuccessOpen || !activeOrder) return null;
 
-  const copyCommand = () => {
-    navigator.clipboard.writeText(activeOrder.command);
-    setCopiedCmd(true);
-    showToast("✓ Perintah LuckPerms berhasil disalin!");
-    setTimeout(() => setCopiedCmd(false), 2000);
-  };
-
   const waText = encodeURIComponent(
-    `Halo Admin Florence Network, pembayaran saya untuk invoice ${activeOrder.invoiceId} (${formatRupiah(activeOrder.total)}) telah berhasil. Akun: ${activeOrder.username} (${activeOrder.platform.toUpperCase()}). Mohon bantuannya jika rank belum aktif. Terima kasih!`
+    `Halo Admin Florence Network, pembayaran saya untuk invoice ${activeOrder.invoiceId} (${formatRupiah(activeOrder.total)}) telah berhasil. Akun: ${activeOrder.username} (${activeOrder.platform.toUpperCase()}). Saya ingin konfirmasi pengambilan rank server. Terima kasih!`
   );
 
   return (
@@ -74,28 +61,27 @@ export default function SuccessModal() {
             <strong className="text-white font-cinzel font-bold">{formatRupiah(activeOrder.total)}</strong>
           </div>
 
-          {/* Generated LuckPerms Command */}
-          <div className="pt-2 border-t border-slate-800">
-            <div className="flex items-center justify-between mb-1">
-              <span className="text-[10px] text-slate-400 flex items-center gap-1">
-                <Terminal className="w-3 h-3 text-cyan-400" /> Perintah Server (Console):
-              </span>
-              <button
-                type="button"
-                onClick={copyCommand}
-                className="text-[10px] text-cyan-300 hover:text-white flex items-center gap-1"
-              >
-                {copiedCmd ? "Tersalin!" : "Salin Perintah"}
-              </button>
+          {/* Instruksi Pengambilan Rank */}
+          <div className="pt-2.5 border-t border-slate-800">
+            <div className="p-2.5 rounded-xl bg-emerald-500/10 border border-emerald-500/30 flex items-center justify-center gap-2 text-emerald-300 text-xs text-center font-semibold">
+              <MessageCircle className="w-4 h-4 shrink-0 text-emerald-400" />
+              <span>Hubungi admin untuk pengambilan rank server</span>
             </div>
-            <code className="block p-2 rounded-lg bg-black border border-slate-800 text-[11px] font-mono text-emerald-400 break-all select-all">
-              /{activeOrder.command}
-            </code>
           </div>
         </div>
 
         {/* Action Buttons */}
         <div className="space-y-2.5">
+          <a
+            href={`https://wa.me/${CONFIG.ADMIN_WA}?text=${waText}`}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="w-full py-3 rounded-xl bg-gradient-to-r from-emerald-600 to-green-600 hover:from-emerald-500 hover:to-green-500 text-white font-montserrat font-bold text-xs tracking-wider uppercase shadow-[0_4px_20px_rgba(16,185,129,0.35)] flex items-center justify-center gap-2 transition-all"
+          >
+            <MessageCircle className="w-4 h-4" />
+            <span>Hubungi Admin untuk Pengambilan Rank Server</span>
+          </a>
+
           <button
             type="button"
             onClick={() => {
@@ -103,7 +89,7 @@ export default function SuccessModal() {
               setIsSuccessOpen(false);
               setIsInvoicePrintOpen(true);
             }}
-            className="btn-fantasy-cyan w-full py-3 rounded-xl text-xs font-bold tracking-wider flex items-center justify-center gap-2"
+            className="btn-fantasy-cyan w-full py-2.5 rounded-xl text-xs font-bold tracking-wider flex items-center justify-center gap-2"
           >
             <Receipt className="w-4 h-4 text-slate-950" />
             <span>LIHAT & CETAK KWITANSI RESMI</span>
@@ -112,21 +98,11 @@ export default function SuccessModal() {
           <button
             type="button"
             onClick={() => setIsSuccessOpen(false)}
-            className="btn-fantasy-gold w-full py-3 rounded-xl text-xs tracking-wider flex items-center justify-center gap-2"
+            className="btn-fantasy-gold w-full py-2.5 rounded-xl text-xs tracking-wider flex items-center justify-center gap-2"
           >
             <ThumbsUp className="w-4 h-4" />
             <span>SELESAI & KEMBALI KE STORE</span>
           </button>
-
-          <a
-            href={`https://wa.me/${CONFIG.ADMIN_WA}?text=${waText}`}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="w-full py-2.5 rounded-xl bg-emerald-500/20 border border-emerald-400/40 text-emerald-300 hover:bg-emerald-500/30 text-xs font-montserrat font-bold flex items-center justify-center gap-2 transition-all"
-          >
-            <MessageCircle className="w-4 h-4 text-emerald-400" />
-            <span>Hubungi WA Admin ({CONFIG.ADMIN_WA_DISPLAY})</span>
-          </a>
         </div>
 
       </div>

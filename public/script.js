@@ -1004,13 +1004,9 @@ function trackOrder() {
         <span>Pemain:</span>
         <strong>${matched.username} (${matched.platform.toUpperCase()})</strong>
       </div>
-      <div style="display:flex; justify-content:space-between; margin-bottom: 0.4rem;">
+      <div style="display:flex; justify-content:space-between; margin-bottom: 0.75rem;">
         <span>Total Nominal:</span>
         <strong style="color:var(--accent-gold);">${formatRupiah(matched.total)}</strong>
-      </div>
-      <div style="display:flex; justify-content:space-between; margin-bottom: 0.75rem;">
-        <span>Perintah Server:</span>
-        <code style="font-size:0.75rem;">${matched.commands[0] || '-'}</code>
       </div>
       <div style="border-top: 1px solid rgba(255,255,255,0.08); padding-top: 0.75rem; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 0.5rem;">
         <span style="font-size: 0.75rem; color: var(--text-muted);">Ada kendala pada pesanan?</span>

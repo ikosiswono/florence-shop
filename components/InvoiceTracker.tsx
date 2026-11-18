@@ -8,7 +8,7 @@ import {
   CheckCircle2, 
   Clock, 
   ShieldCheck, 
-  Terminal,
+  MessageCircle,
   ExternalLink
 } from "lucide-react";
 import { useShop } from "@/context/ShopContext";
@@ -135,12 +135,15 @@ export default function InvoiceTracker() {
             </div>
 
             <div className="pt-2 border-t border-slate-800">
-              <span className="text-[10px] text-slate-400 block mb-1">
-                Perintah Server LuckPerms:
-              </span>
-              <code className="block p-2 rounded-lg bg-black border border-slate-800 text-[11px] font-mono text-emerald-400 select-all">
-                {searchResult.command.startsWith("/") ? searchResult.command : `/${searchResult.command}`}
-              </code>
+              <a
+                href={`https://wa.me/${CONFIG.ADMIN_WA}?text=${encodeURIComponent(`Halo Admin Florence Network, pembayaran invoice ${searchResult.invoiceId} (${searchResult.username}) telah selesai. Saya ingin konfirmasi pengambilan rank server.`)}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="w-full py-2 px-3 rounded-xl bg-emerald-500/15 border border-emerald-500/30 text-emerald-300 hover:bg-emerald-500/25 text-xs font-semibold flex items-center justify-center gap-2 transition-all"
+              >
+                <MessageCircle className="w-3.5 h-3.5 text-emerald-400" />
+                <span>Hubungi admin untuk pengambilan rank server</span>
+              </a>
             </div>
           </div>
         )}
