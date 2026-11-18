@@ -52,16 +52,16 @@ export default function Header() {
     <header
       className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
         isScrolled
-          ? "bg-[#041022]/90 backdrop-blur-md border-b border-cyan-400/20 py-2.5 shadow-[0_8px_30px_rgba(0,0,0,0.7)]"
-          : "bg-gradient-to-b from-[#041022]/85 via-[#041022]/40 to-transparent py-4"
+          ? "bg-[#041022]/95 backdrop-blur-md border-b border-cyan-400/20 py-1 sm:py-2.5 shadow-[0_6px_25px_rgba(0,0,0,0.8)]"
+          : "bg-gradient-to-b from-[#041022]/95 via-[#041022]/60 to-transparent py-1 sm:py-3"
       }`}
     >
-      <div className="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8">
-        <div className="flex items-center justify-between gap-2 sm:gap-4 h-14 sm:h-16">
+      <div className="max-w-7xl mx-auto px-2.5 sm:px-6 lg:px-8">
+        <div className="flex items-center justify-between gap-1.5 sm:gap-4 h-10 sm:h-14 lg:h-16">
           
           {/* Brand Logo & Name */}
-          <a href="#hero" className="flex items-center gap-2.5 sm:gap-3 group shrink-0">
-            <div className="relative w-10 h-10 sm:w-12 sm:h-12 flex items-center justify-center p-0.5 filter drop-shadow-[0_0_12px_rgba(40,216,232,0.5)] group-hover:scale-105 transition-transform shrink-0">
+          <a href="#hero" className="flex items-center gap-1.5 sm:gap-2.5 group shrink-0">
+            <div className="relative w-6 h-6 sm:w-9 sm:h-9 lg:w-11 lg:h-11 flex items-center justify-center filter drop-shadow-[0_0_8px_rgba(40,216,232,0.5)] group-hover:scale-105 transition-transform shrink-0">
               <Image
                 src="/assets/logo/florence-network-logo.png"
                 alt="Florence Network Logo"
@@ -71,10 +71,10 @@ export default function Header() {
               />
             </div>
             <div className="flex flex-col">
-              <span className="font-cinzel text-base sm:text-xl font-black tracking-wider text-gold-gradient group-hover:text-shadow-gold transition-all whitespace-nowrap">
+              <span className="font-cinzel text-xs sm:text-base lg:text-lg font-black tracking-wide text-gold-gradient group-hover:text-shadow-gold transition-all whitespace-nowrap leading-tight">
                 FLORENCE <span className="text-cyan-300">NETWORK</span>
               </span>
-              <span className="text-[8px] sm:text-[9px] tracking-[0.2em] text-cyan-200 uppercase font-montserrat font-bold whitespace-nowrap">
+              <span className="text-[6.5px] sm:text-[8px] lg:text-[9px] tracking-[0.16em] text-cyan-200 uppercase font-montserrat font-bold whitespace-nowrap leading-tight">
                 Minecraft Bedrock Server
               </span>
             </div>
@@ -103,31 +103,31 @@ export default function Header() {
             </button>
           </nav>
 
-          {/* Header Action Buttons (Uniform height h-9/h-10, aligned, zero wrapping) */}
-          <div className="flex items-center gap-2 sm:gap-2.5 shrink-0">
+          {/* Header Action Buttons (Proportioned for mobile & desktop) */}
+          <div className="flex items-center gap-1.5 sm:gap-2.5 shrink-0">
             
             {/* Account / Auth Button */}
             {currentUser ? (
               <Link
                 href="/dashboard"
-                className="h-9 sm:h-10 px-2.5 sm:px-3 rounded-xl bg-[#061B35]/90 border border-amber-300/40 hover:border-amber-300 shadow-glow-gold flex items-center gap-2 whitespace-nowrap transition-all group shrink-0"
+                className="h-7 sm:h-9 lg:h-10 px-1.5 sm:px-2.5 lg:px-3 rounded-lg sm:rounded-xl bg-[#061B35]/90 border border-amber-300/40 hover:border-amber-300 shadow-glow-gold flex items-center gap-1.5 sm:gap-2 whitespace-nowrap transition-all group shrink-0"
                 title={`Buka Dashboard ${currentUser.gamertag}`}
               >
-                <div className="w-6 h-6 rounded-md bg-slate-950 border border-amber-300/70 overflow-hidden flex items-center justify-center shrink-0">
+                <div className="w-4.5 h-4.5 sm:w-6 sm:h-6 rounded bg-slate-950 border border-amber-300/70 overflow-hidden flex items-center justify-center shrink-0">
                   <Image
                     src={currentUser.avatarUrl || `https://mc-heads.net/avatar/${encodeURIComponent(currentUser.gamertag)}/24`}
                     alt={currentUser.gamertag}
-                    width={24}
-                    height={24}
+                    width={20}
+                    height={20}
                     className="object-contain image-rendering-pixelated"
                     unoptimized
                   />
                 </div>
-                <div className="flex flex-col text-left">
-                  <span className="font-cinzel text-xs font-bold text-white group-hover:text-amber-300 truncate max-w-[85px] sm:max-w-[105px] leading-tight">
+                <div className="flex flex-col text-left leading-none">
+                  <span className="font-cinzel text-[10px] sm:text-xs font-bold text-white group-hover:text-amber-300 truncate max-w-[65px] sm:max-w-[95px] leading-tight">
                     {currentUser.gamertag}
                   </span>
-                  <span className="text-[8px] font-montserrat text-emerald-400 font-bold uppercase leading-tight">
+                  <span className="text-[6.5px] sm:text-[8px] font-montserrat text-emerald-400 font-bold uppercase leading-tight">
                     {currentUser.rank || "Dashboard"}
                   </span>
                 </div>
@@ -140,10 +140,13 @@ export default function Header() {
                   setAuthMessage(null);
                   setIsAuthOpen(true);
                 }}
-                className="h-9 sm:h-10 px-3 sm:px-4 rounded-xl btn-fantasy-gold text-xs font-montserrat font-bold tracking-wider flex items-center justify-center gap-1.5 whitespace-nowrap shadow-glow-gold hover:scale-[1.02] active:scale-95 transition-all shrink-0"
+                className="h-7 sm:h-9 lg:h-10 px-2 sm:px-3 lg:px-4 rounded-lg sm:rounded-xl btn-fantasy-gold text-[10px] sm:text-xs font-montserrat font-bold tracking-wider flex items-center justify-center gap-1 whitespace-nowrap shadow-glow-gold hover:scale-[1.02] active:scale-95 transition-all shrink-0"
               >
-                <User className="w-3.5 h-3.5 shrink-0" />
-                <span className="whitespace-nowrap">MASUK / DAFTAR</span>
+                <User className="w-3 h-3 sm:w-3.5 sm:h-3.5 shrink-0" />
+                <span>
+                  <span className="inline sm:hidden">MASUK</span>
+                  <span className="hidden sm:inline">MASUK / DAFTAR</span>
+                </span>
               </button>
             )}
 
@@ -162,12 +165,12 @@ export default function Header() {
             <button
               type="button"
               onClick={() => setIsCartOpen(true)}
-              className="h-9 w-9 sm:h-10 sm:w-10 rounded-xl bg-gradient-to-br from-cyan-500/20 to-blue-900/30 border border-cyan-400/40 text-cyan-200 hover:text-white hover:border-cyan-300 shadow-glow flex items-center justify-center relative transition-all shrink-0"
+              className="h-7 w-7 sm:h-9 sm:w-9 lg:h-10 lg:w-10 rounded-lg sm:rounded-xl bg-gradient-to-br from-cyan-500/20 to-blue-900/30 border border-cyan-400/40 text-cyan-200 hover:text-white hover:border-cyan-300 shadow-glow flex items-center justify-center relative transition-all shrink-0"
               aria-label="Keranjang Belanja"
             >
-              <ShoppingCart className="w-4 h-4 sm:w-4.5 sm:h-4.5" />
+              <ShoppingCart className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
               {cartCount > 0 && (
-                <span className="absolute -top-1 -right-1 bg-gradient-to-r from-amber-400 to-amber-500 text-slate-950 text-[9px] font-black w-4 h-4 rounded-full flex items-center justify-center shadow-md animate-bounce">
+                <span className="absolute -top-1 -right-1 bg-gradient-to-r from-amber-400 to-amber-500 text-slate-950 text-[8px] sm:text-[9px] font-black w-3.5 h-3.5 sm:w-4 sm:h-4 rounded-full flex items-center justify-center shadow-md animate-bounce">
                   {cartCount}
                 </span>
               )}
@@ -177,10 +180,10 @@ export default function Header() {
             <button
               type="button"
               onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-              className="lg:hidden h-9 w-9 sm:h-10 sm:w-10 rounded-xl bg-slate-900/80 border border-cyan-400/30 text-cyan-300 flex items-center justify-center hover:text-white hover:border-cyan-400 transition-all shrink-0"
+              className="lg:hidden h-7 w-7 sm:h-9 sm:w-9 lg:h-10 lg:w-10 rounded-lg sm:rounded-xl bg-slate-900/80 border border-cyan-400/30 text-cyan-300 flex items-center justify-center hover:text-white hover:border-cyan-400 transition-all shrink-0"
               aria-label="Toggle Menu"
             >
-              {mobileMenuOpen ? <X className="w-4 h-4 sm:w-5 sm:h-5" /> : <Menu className="w-4 h-4 sm:w-5 sm:h-5" />}
+              {mobileMenuOpen ? <X className="w-3.5 h-3.5 sm:w-4 sm:h-4" /> : <Menu className="w-3.5 h-3.5 sm:w-4 sm:h-4" />}
             </button>
 
           </div>
@@ -190,8 +193,8 @@ export default function Header() {
 
       {/* Mobile Drawer (Visible on screens below lg) */}
       {mobileMenuOpen && (
-        <div className="lg:hidden bg-[#051428]/95 backdrop-blur-xl border-b border-cyan-400/30 px-6 py-5 transition-all animate-fadeIn">
-          <nav className="flex flex-col space-y-3">
+        <div className="lg:hidden bg-[#051428]/98 backdrop-blur-2xl border-b border-cyan-400/30 px-4 py-4 sm:px-6 sm:py-5 transition-all animate-fadeIn shadow-2xl">
+          <nav className="flex flex-col space-y-2.5">
             {navLinks.map((link) => (
               <a
                 key={link.name}

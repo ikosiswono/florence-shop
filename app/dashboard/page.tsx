@@ -448,17 +448,17 @@ export default function DashboardPage() {
         <main className="flex-1 p-4 sm:p-6 lg:p-7 flex flex-col space-y-6 overflow-y-auto max-h-[96vh]">
           
           {/* Top Bar: Search, Server Status, Notifications & Player Profile Capsule */}
-          <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
+          <div className="flex flex-col sm:flex-row items-center justify-between gap-2.5 sm:gap-4">
             
             {/* Search Input Bar (Matches Reference Image) */}
             <div className="relative w-full sm:max-w-md">
-              <Search className="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2" />
+              <Search className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-slate-400 absolute left-3 sm:left-3.5 top-1/2 -translate-y-1/2" />
               <input
                 type="text"
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 placeholder="Cari perintah rank, benefit, invoice ID..."
-                className="w-full bg-[#1b1129]/80 border border-[#381e4f] rounded-2xl py-2.5 pl-10 pr-4 text-xs font-montserrat text-white placeholder-slate-400 focus:outline-none focus:border-red-400/80 transition-all shadow-inner"
+                className="w-full bg-[#1b1129]/80 border border-[#381e4f] rounded-xl sm:rounded-2xl py-2 sm:py-2.5 pl-9 sm:pl-10 pr-3 sm:pr-4 text-[11px] sm:text-xs font-montserrat text-white placeholder-slate-400 focus:outline-none focus:border-red-400/80 transition-all shadow-inner"
               />
             </div>
 
