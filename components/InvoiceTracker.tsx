@@ -139,7 +139,7 @@ export default function InvoiceTracker() {
                 Perintah Server LuckPerms:
               </span>
               <code className="block p-2 rounded-lg bg-black border border-slate-800 text-[11px] font-mono text-emerald-400 select-all">
-                /{searchResult.command}
+                {searchResult.command.startsWith("/") ? searchResult.command : `/${searchResult.command}`}
               </code>
             </div>
           </div>

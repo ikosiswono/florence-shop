@@ -51,13 +51,28 @@ export default function InvoicePrintModal() {
 
     try {
       const element = invoiceCardRef.current;
-      const canvas = await html2canvas(element, {
-        scale: 2.5, // 2.5x high-DPI crystal clear capture
-        backgroundColor: "#030c1b",
-        useCORS: true,
-        allowTaint: true,
-        logging: false
-      });
+      
+      let canvas: HTMLCanvasElement;
+      try {
+        canvas = await html2canvas(element, {
+          scale: 2.5, // 2.5x high-DPI crystal clear capture
+          backgroundColor: "#030c1b",
+          useCORS: true,
+          allowTaint: false,
+          logging: false
+        });
+      } catch (corsErr) {
+        // Fallback capture ignoring remote images that might fail CORS
+        console.warn("CORS issue detected during canvas capture, falling back with safe mode:", corsErr);
+        canvas = await html2canvas(element, {
+          scale: 2,
+          backgroundColor: "#030c1b",
+          useCORS: false,
+          allowTaint: false,
+          logging: false,
+          ignoreElements: (el) => el.tagName === "IMG" && el.getAttribute("src")?.startsWith("http") === true
+        });
+      }
 
       const imgData = canvas.toDataURL("image/png");
       const downloadLink = document.createElement("a");
@@ -70,6 +85,7 @@ export default function InvoicePrintModal() {
       showToast("✓ Kwitansi resmi berhasil diunduh ke perangkat Anda! Silakan kirimkan gambarnya ke WhatsApp Admin.");
     } catch (err) {
       console.error("Gagal mengunduh gambar invoice:", err);
+      showToast("⚠️ Browser membatasi unduhan otomatis. Membuka jendela cetak/PDF...");
       // Fallback to print
       window.print();
     } finally {

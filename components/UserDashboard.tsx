@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import Image from "next/image";
 import { 
   X, 
@@ -49,6 +49,13 @@ export default function UserDashboard() {
   const [newPassword, setNewPassword] = useState("");
   const [isSaving, setIsSaving] = useState(false);
   const [copiedIP, setCopiedIP] = useState(false);
+
+  useEffect(() => {
+    if (currentUser) {
+      setPhoneInput(currentUser.phone || "");
+      setBioInput(currentUser.bio || "");
+    }
+  }, [currentUser]);
 
   if (!isDashboardOpen || !currentUser) return null;
 
