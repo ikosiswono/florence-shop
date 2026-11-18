@@ -36,6 +36,7 @@ export interface Order {
 
 export interface UserProfile {
   id: string;
+  fullName?: string;
   gamertag: string;
   phone: string;
   email?: string;

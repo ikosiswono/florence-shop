@@ -31,8 +31,8 @@ export default function WhyChooseUs() {
     },
     {
       icon: Crown,
-      title: "Rank Per-Season (Aktif 1 Season)",
-      desc: "Rank ini berlaku khusus selama Season berjalan! Masa aktif mengikuti durasi season server hingga dilakukan reset/ganti season baru. Seluruh fasilitas command, money, dan kit perlengkapan dapat dinikmati penuh sepanjang season.",
+      title: "Rank Per-Tema Server (Aktif Selama Tema Berjalan)",
+      desc: "Rank ini berlaku khusus selama tema server saat ini berlangsung! Masa aktif mengikuti rotasi tema server hingga dilakukan pembaruan atau ganti tema baru. Seluruh fasilitas command, money, dan kit perlengkapan dapat dinikmati penuh sepanjang tema berjalan.",
       color: "text-purple-400 bg-purple-500/10 border-purple-400/30",
     },
     {
@@ -95,7 +95,7 @@ export default function WhyChooseUs() {
                     <span>FLORENCE MONARCH TIER</span>
                   </span>
                   <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-amber-500/20 text-amber-300 text-[10px] font-semibold tracking-wide border border-amber-400/30">
-                    BERLAKU SELAMA SEASON BERJALAN
+                    BERLAKU SELAMA TEMA SERVER BERJALAN
                   </span>
                 </div>
 

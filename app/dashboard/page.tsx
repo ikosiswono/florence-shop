@@ -536,7 +536,7 @@ export default function DashboardPage() {
                   <div className="relative z-10 flex items-center gap-2 mb-3">
                     <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-amber-400/20 border border-amber-300/40 text-amber-300 text-[10px] font-montserrat font-bold uppercase tracking-wider">
                       <Sparkles className="w-3 h-3 text-amber-400" />
-                      AKTIF SEASON 5 (PER-SEASON)
+                      AKTIF SELAMA TEMA BERJALAN (PER-TEMA SERVER)
                     </span>
 
                     <span className="px-2.5 py-1 rounded-full bg-emerald-500/20 text-emerald-300 text-[10px] font-mono font-bold">
@@ -550,7 +550,7 @@ export default function DashboardPage() {
                       Selamat Datang, {currentUser.gamertag}!
                     </h2>
                     <p className="text-xs text-slate-300 font-sans leading-relaxed">
-                      Status akun Anda aktif di server Minecraft Bedrock Florence Network. Rank berlaku selama masa aktif Season 5 berjalan. Nikmati perintah in-game khusus dan akses brankas eksklusif.
+                      Status akun Anda aktif di server Minecraft Bedrock Florence Network. Rank berlaku aktif selama tema server saat ini berlangsung hingga pergantian tema server berikutnya. Nikmati perintah in-game khusus dan akses brankas eksklusif.
                     </p>
                   </div>
 
@@ -640,7 +640,7 @@ export default function DashboardPage() {
                   <div className="flex items-center gap-2">
                     <Crown className="w-4 h-4 text-amber-400" />
                     <h3 className="font-cinzel text-sm sm:text-base font-extrabold text-white tracking-wider">
-                      REKOMENDASI RANK POPULER SEASON 5
+                      REKOMENDASI RANK POPULER TEMA SERVER INI
                     </h3>
                   </div>
                   <Link
@@ -724,7 +724,7 @@ export default function DashboardPage() {
                     Katalog Lengkap Rank & Benefit In-Game
                   </h3>
                   <p className="text-xs text-slate-400">
-                    Semua rank berstatus aktif per season (Season 5).
+                    Semua rank berstatus aktif selama tema server saat ini berlangsung.
                   </p>
                 </div>
               </div>
@@ -799,7 +799,7 @@ export default function DashboardPage() {
                     Belum Ada Riwayat Pembelian
                   </h4>
                   <p className="text-xs text-slate-400 max-w-sm mx-auto">
-                    Anda belum melakukan pembelian rank pada Season ini. Jelajahi katalog rank untuk meningkatkan pengalaman bermain Anda!
+                    Anda belum melakukan pembelian rank pada tema server saat ini. Jelajahi katalog rank untuk meningkatkan pengalaman bermain Anda!
                   </p>
                   <Link
                     href="/#katalog"
@@ -886,7 +886,7 @@ export default function DashboardPage() {
                     <Receipt className="w-8 h-8" />
                   </div>
                   <h4 className="font-cinzel text-base font-bold text-white">
-                    Belum Ada Riwayat Pembelian Rank di Season 5
+                    Belum Ada Riwayat Pembelian Rank di Tema Server Saat Ini
                   </h4>
                   <p className="text-xs text-slate-400 max-w-md mx-auto leading-relaxed">
                     Tidak ada data dummy. Ketika ada pemain yang melakukan pembelian rank melalui Web Store, data transaksi akan otomatis masuk ke Google Spreadsheet dan langsung tampil pada daftar ini secara real-time.

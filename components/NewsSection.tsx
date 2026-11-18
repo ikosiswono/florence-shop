@@ -32,7 +32,7 @@ export default function NewsSection() {
     {
       id: "news-1",
       category: "UPDATE",
-      title: "Infernal Bonus Server Grand Opening — Season V",
+      title: "Infernal Bonus Server Grand Opening — Tema Baru Florence",
       date: "February 9, 2026",
       author: "Marcus X (Lead GM)",
       excerpt: "Bergabunglah dalam peluncuran server terbaru dengan bonus EXP 300%, drop rate legendaris, dan dungeon Celestial Fortress yang terbuka perdana.",

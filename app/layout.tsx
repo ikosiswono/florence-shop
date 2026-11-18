@@ -6,7 +6,7 @@ import Providers from "@/components/Providers";
 export const metadata: Metadata = {
   metadataBase: new URL("https://play.florenceshop.net"),
   title: "Florence Network — Official Minecraft Bedrock & Java Store",
-  description: "Toko digital dan top-up rank resmi server Minecraft Florence Network (Bedrock & Java Edition). Beli rank per-season dengan akses perintah khusus, bonus uang in-game, dan kit perlengkapan via QRIS, DANA, dan GoPay.",
+  description: "Toko digital dan top-up rank resmi server Minecraft Florence Network (Bedrock & Java Edition). Beli rank per-tema server dengan akses perintah khusus, bonus uang in-game, dan kit perlengkapan via QRIS, DANA, dan GoPay.",
   keywords: [
     "Florence Network",
     "FlorenceSMP",
@@ -24,7 +24,7 @@ export const metadata: Metadata = {
   },
   openGraph: {
     title: "Florence Network — Official Minecraft Bedrock Store",
-    description: "Upgrade akun Minecraft kamu di Florence Network! Dapatkan rank per-season dengan akses perintah, bonus saldo uang in-game, dan kit perlengkapan.",
+    description: "Upgrade akun Minecraft kamu di Florence Network! Dapatkan rank per-tema server dengan akses perintah, bonus saldo uang in-game, dan kit perlengkapan.",
     url: "https://play.florenceshop.net",
     siteName: "Florence Network Store",
     images: [

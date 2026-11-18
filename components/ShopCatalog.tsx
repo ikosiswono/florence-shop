@@ -72,7 +72,7 @@ export default function ShopCatalog() {
           </h2>
 
           <p className="text-slate-300 text-xs sm:text-sm font-sans font-light leading-relaxed">
-            Semua rank berstatus <strong className="text-amber-300">Aktif Per-Season (1 Season Penuh)</strong> dengan aktivasi perintah instan. Masa aktif rank berlaku selama season server berjalan hingga reset atau pergantian season baru.
+            Semua rank berstatus <strong className="text-amber-300">Aktif Selama Tema Server Berjalan (Per-Tema)</strong> dengan aktivasi perintah instan. Hak istimewa dan benefit melekat pada akun Anda selama tema server saat ini berlangsung dan akan diperbarui ketika server berganti tema baru.
           </p>
         </div>
 

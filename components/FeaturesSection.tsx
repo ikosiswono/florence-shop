@@ -92,7 +92,7 @@ export default function FeaturesSection() {
       image: "/assets/characters/character-sorceress.webp",
       videoBadge: "GAMEPLAY 4K",
       author: "Marcus X (Lead GM)",
-      date: "Season V",
+      date: "Tema Aktif",
     },
     {
       name: "SHADOWBLADE VALKYRIE",
@@ -101,7 +101,7 @@ export default function FeaturesSection() {
       image: "/assets/characters/character-assassin.webp",
       videoBadge: "CLASS SHOWCASE",
       author: "Aetheria DevTeam",
-      date: "Season V",
+      date: "Tema Aktif",
     },
     {
       name: "NETHER BERSERKER",
@@ -110,7 +110,7 @@ export default function FeaturesSection() {
       image: "/assets/characters/character-berserker.webp",
       videoBadge: "ARENA COMBAT",
       author: "Combat Director",
-      date: "Season V",
+      date: "Tema Aktif",
     },
     {
       name: "CELESTIAL PALADIN",
@@ -119,7 +119,7 @@ export default function FeaturesSection() {
       image: "/assets/characters/character-warrior.webp",
       videoBadge: "RAID TANK",
       author: "Vanguard Guild",
-      date: "Season V",
+      date: "Tema Aktif",
     },
   ];
 

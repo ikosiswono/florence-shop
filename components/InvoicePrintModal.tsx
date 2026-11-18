@@ -263,7 +263,7 @@ export default function InvoicePrintModal() {
                 STATUS KLAIM:
               </span>
               <span className="text-emerald-400 print:text-emerald-700 text-xs font-bold font-montserrat block">
-                AKTIF 1 SEASON
+                AKTIF 1 TEMA SERVER
               </span>
             </div>
 
@@ -300,7 +300,7 @@ export default function InvoicePrintModal() {
                         </span>
                       </td>
                       <td className="py-2.5 text-[11px] text-slate-300 print:text-slate-600 font-montserrat">
-                        {item.duration || "1 Season"}
+                        {item.duration || "Selama Tema Berjalan"}
                       </td>
                       <td className="py-2.5 text-center font-mono font-bold">
                         {item.quantity}

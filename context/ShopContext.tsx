@@ -52,7 +52,7 @@ interface ShopContextType {
   setSelectedInvoice: (order: Order | null) => void;
 
   // Auth Functions
-  registerUser: (gamertag: string, password: string, phone: string, email?: string) => Promise<{ success: boolean; message: string }>;
+  registerUser: (gamertag: string, password: string, phone: string, email?: string, fullName?: string) => Promise<{ success: boolean; message: string }>;
   loginUser: (gamertag: string, password: string) => Promise<{ success: boolean; message: string }>;
   loginWithGoogle: (googleUser: { name: string; email: string; gamertag: string; phone?: string }) => Promise<{ success: boolean; message: string }>;
   updateUserProfile: (data: Partial<UserProfile>) => Promise<{ success: boolean; message: string }>;
@@ -180,11 +180,13 @@ export function ShopProvider({ children }: { children: React.ReactNode }) {
     gamertag: string,
     password: string,
     phone: string,
-    email?: string
+    email?: string,
+    fullName?: string
   ): Promise<{ success: boolean; message: string }> => {
     const cleanGt = sanitizeInput(gamertag);
     const cleanPhone = sanitizeInput(phone);
     const cleanEmail = sanitizeInput(email || "");
+    const cleanFullName = sanitizeInput(fullName || "");
 
     // 1. Verifikasi Validitas dan Whitelist Resmi
     const authCheck = checkGamertagAuthorization(cleanGt);
@@ -198,7 +200,7 @@ export function ShopProvider({ children }: { children: React.ReactNode }) {
     if (!password || password.length < 5) {
       return { success: false, message: "Password minimal 5 karakter demi keamanan akun Anda." };
     }
-    if (!cleanPhone || cleanPhone.length < 9) {
+    if (!cleanPhone || cleanPhone.length < 8) {
       return { success: false, message: "Masukkan nomor WhatsApp yang valid untuk konfirmasi penerimaan rank." };
     }
 
@@ -221,6 +223,7 @@ export function ShopProvider({ children }: { children: React.ReactNode }) {
 
     const newUser: UserProfile = {
       id: `usr_${Date.now()}`,
+      fullName: cleanFullName,
       gamertag: cleanGt,
       phone: cleanPhone,
       email: cleanEmail,
@@ -232,7 +235,7 @@ export function ShopProvider({ children }: { children: React.ReactNode }) {
       rank: initialRank,
       joinedAt: new Date().toISOString(),
       lastLoginAt: new Date().toISOString(),
-      seasonExpiry: "Aktif Season 5 (Hingga Akhir Season)",
+      seasonExpiry: "Aktif Selama Tema Server Berjalan (Reset Saat Ganti Tema)",
       avatarUrl,
       verified: true,
       loginMethod: "gamertag"
