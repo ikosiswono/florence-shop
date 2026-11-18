@@ -779,18 +779,14 @@ export default function DashboardPage() {
                       </div>
                     </div>
 
-                    {/* Right: Live Interactive Walking 3D Minecraft Character */}
-                    <div className="md:col-span-5 flex flex-col items-center justify-center">
-                      <div className="w-full max-w-[210px] h-[240px] rounded-2xl bg-black/40 border border-[#4d195c]/60 p-2 relative flex items-center justify-center shadow-inner">
-                        <MinecraftSkinViewer
-                          skinUrl={currentUser.customSkinUrl}
-                          gamertag={currentUser.gamertag}
-                          height={220}
-                        />
-                        <span className="absolute bottom-2 left-2 px-2 py-0.5 rounded bg-black/70 text-[9px] font-mono text-emerald-400 border border-emerald-500/30">
-                          3D Walking Skin
-                        </span>
-                      </div>
+                    {/* Right: Live Interactive Walking 3D Minecraft Character (Blends Directly Into Main Hero Card, Rotatable Like Nova Skin) */}
+                    <div className="md:col-span-5 flex items-center justify-center relative min-h-[300px]">
+                      <MinecraftSkinViewer
+                        skinUrl={currentUser.customSkinUrl}
+                        gamertag={currentUser.gamertag}
+                        width={250}
+                        height={320}
+                      />
                     </div>
 
                   </div>
