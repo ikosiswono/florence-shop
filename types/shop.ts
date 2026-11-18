@@ -34,6 +34,17 @@ export interface Order {
   userPhone?: string;
   approvedAt?: string;
   approvedBy?: string;
+  paymentProofUrl?: string;
+  driveFileId?: string;
+  driveViewUrl?: string;
+  proofAnalysis?: {
+    verified: boolean;
+    nominal: number;
+    nominalMatched: boolean;
+    buyerMatched: boolean;
+    timestamp: string;
+    details: string;
+  };
 }
 
 export interface UserProfile {
@@ -48,6 +59,10 @@ export interface UserProfile {
   role?: "member" | "vip" | "moderator" | "admin" | "owner";
   bio?: string;
   rank?: string;
+  activeBenefits?: string[];
+  customSkinUrl?: string;
+  skinFormat?: "64x64" | "128x128";
+  skinModel?: "classic" | "slim";
   joinedAt: string;
   lastLoginAt?: string;
   seasonExpiry?: string;

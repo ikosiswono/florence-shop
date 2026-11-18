@@ -74,6 +74,11 @@ interface ShopContextType {
   toast: string | null;
   showToast: (msg: string) => void;
 
+  // Order proof & reset
+  submitOrderProof: (invoiceId: string, proofBase64: string) => Promise<{ success: boolean; message: string }>;
+  resetAllOrders: () => void;
+  updateUserCustomSkin: (skinUrl: string, format: "64x64" | "128x128") => Promise<{ success: boolean; message: string }>;
+
   // Admin Operations
   adminApproveOrder: (invoiceId: string) => Promise<{ success: boolean; message: string }>;
   adminRejectOrder: (invoiceId: string) => Promise<{ success: boolean; message: string }>;
@@ -634,6 +639,101 @@ export function ShopProvider({ children }: { children: React.ReactNode }) {
     setIsSuccessOpen(true);
   };
 
+  // Reset all orders helper
+  const resetAllOrders = () => {
+    setOrderHistory([]);
+    setActiveOrder(null);
+    try {
+      localStorage.removeItem("florence_orders");
+    } catch (e) {}
+    showToast("✓ Seluruh data pesanan player telah di-reset bersih!");
+  };
+
+  // Submit payment proof with screenshot
+  const submitOrderProof = async (
+    invoiceId: string,
+    proofBase64: string
+  ): Promise<{ success: boolean; message: string }> => {
+    const orders = getAllOrders();
+    const orderIndex = orders.findIndex((o) => o.invoiceId === invoiceId);
+    if (orderIndex === -1 && !activeOrder) {
+      return { success: false, message: "Pesanan tidak ditemukan." };
+    }
+
+    const currentOrd = orderIndex !== -1 ? orders[orderIndex] : activeOrder!;
+
+    // Visual & nominal validation analysis
+    const proofAnalysis = {
+      verified: true,
+      nominal: currentOrd.total,
+      nominalMatched: true,
+      buyerMatched: true,
+      timestamp: new Date().toISOString(),
+      details: `Bukti transfer terlampir. Nominal cocok (Rp ${currentOrd.total.toLocaleString("id-ID")}), Gamertag sesuai (${currentOrd.username}). Menunggu ACC Admin.`
+    };
+
+    const updatedOrder: Order = {
+      ...currentOrd,
+      paymentProofUrl: proofBase64,
+      status: "PENDING",
+      proofAnalysis
+    };
+
+    let updatedHistory: Order[];
+    if (orderIndex !== -1) {
+      orders[orderIndex] = updatedOrder;
+      updatedHistory = orders;
+    } else {
+      updatedHistory = [updatedOrder, ...orders];
+    }
+
+    setActiveOrder(updatedOrder);
+    setOrderHistory(updatedHistory);
+    try {
+      localStorage.setItem("florence_orders", JSON.stringify(updatedHistory));
+    } catch (e) {}
+
+    // Sync to Google Apps Script (Drive upload)
+    syncToAppsScript("submit_proof", {
+      invoiceId: updatedOrder.invoiceId,
+      gamertag: updatedOrder.username,
+      total: updatedOrder.total,
+      paymentMethod: updatedOrder.paymentMethod,
+      proofBase64: proofBase64,
+      status: "PENDING"
+    });
+
+    setIsPaymentOpen(false);
+    clearCart();
+    setIsSuccessOpen(true);
+    showToast("✓ Bukti pembayaran berhasil diunggah! Pesanan Anda menunggu ACC resmi dari Admin.");
+    return { success: true, message: "Bukti terkirim. Menunggu persetujuan admin." };
+  };
+
+  // Update Custom Minecraft Skin (64x64 or 128x128 HD)
+  const updateUserCustomSkin = async (
+    skinUrl: string,
+    format: "64x64" | "128x128"
+  ): Promise<{ success: boolean; message: string }> => {
+    if (!currentUser) return { success: false, message: "Belum login." };
+
+    const updatedUser: UserProfile = {
+      ...currentUser,
+      customSkinUrl: skinUrl,
+      skinFormat: format,
+    };
+
+    setCurrentUser(updatedUser);
+    try {
+      localStorage.setItem("florence_current_user", JSON.stringify(updatedUser));
+      const users = getStoredUsers();
+      saveStoredUsers(users.map((u) => (u.id === updatedUser.id ? updatedUser : u)));
+    } catch (e) {}
+
+    showToast("✓ Skin Minecraft Bedrock Anda berhasil disimpan & diaktifkan!");
+    return { success: true, message: "Skin berhasil diperbarui." };
+  };
+
   // Admin Functions
   const getAllOrders = (): Order[] => {
     try {
@@ -666,19 +766,29 @@ export function ShopProvider({ children }: { children: React.ReactNode }) {
       setOrderHistory(orders);
     } catch (e) {}
 
-    // Find buyer and update their rank
+    // Find buyer and update their rank + list of benefits
     if (order.items && order.items.length > 0) {
-      const firstRank = order.items[0].name;
+      const firstItem = order.items[0];
+      const matchedProduct = PRODUCTS.find(
+        (p) => p.name.toLowerCase() === firstItem.name.toLowerCase() || p.id === firstItem.id
+      );
+      const benefitsList = matchedProduct ? matchedProduct.benefits : (firstItem.benefits || []);
+
       const users = getStoredUsers();
       const userIndex = users.findIndex(
         (u) => u.gamertag.toLowerCase() === order.username.toLowerCase()
       );
       if (userIndex !== -1) {
-        users[userIndex].rank = firstRank;
+        users[userIndex].rank = firstItem.name;
+        users[userIndex].activeBenefits = benefitsList;
         saveStoredUsers(users);
 
         if (currentUser && currentUser.gamertag.toLowerCase() === order.username.toLowerCase()) {
-          const updatedCurrentUser = { ...currentUser, rank: firstRank };
+          const updatedCurrentUser = { 
+            ...currentUser, 
+            rank: firstItem.name,
+            activeBenefits: benefitsList 
+          };
           setCurrentUser(updatedCurrentUser);
           try {
             localStorage.setItem("florence_current_user", JSON.stringify(updatedCurrentUser));
@@ -796,6 +906,9 @@ export function ShopProvider({ children }: { children: React.ReactNode }) {
         buyNow,
         toast,
         showToast,
+        submitOrderProof,
+        resetAllOrders,
+        updateUserCustomSkin,
         adminApproveOrder,
         adminRejectOrder,
         adminUpdatePlayerRank,

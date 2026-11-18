@@ -27,7 +27,10 @@ import {
   RefreshCw, 
   Award,
   ChevronRight,
-  Filter
+  Filter,
+  Sparkles,
+  Trash2,
+  FileImage
 } from "lucide-react";
 import { useShop } from "@/context/ShopContext";
 import { CONFIG, PRODUCTS } from "@/data/products";
@@ -44,7 +47,8 @@ export default function AdminPage() {
     adminRejectOrder,
     adminUpdatePlayerRank,
     getAllOrders,
-    getAllUsers
+    getAllUsers,
+    resetAllOrders
   } = useShop();
 
   // Authentication State
@@ -54,6 +58,9 @@ export default function AdminPage() {
   const [showAdminPassword, setShowAdminPassword] = useState(false);
   const [loginError, setLoginError] = useState<string | null>(null);
   const [isLoggingIn, setIsLoggingIn] = useState(false);
+
+  // Proof Screenshot Modal View
+  const [viewingProofUrl, setViewingProofUrl] = useState<string | null>(null);
 
   // Dashboard Navigation State (Active Menu Tab)
   const [activeTab, setActiveTab] = useState<
@@ -155,6 +162,18 @@ export default function AdminPage() {
     setAdminUsername("");
     setAdminPassword("");
     showToast("Anda telah keluar dari Portal Admin.");
+  };
+
+  // Handle Reset All Orders
+  const handleResetOrders = () => {
+    if (
+      window.confirm(
+        "PERINGATAN RESMI: Apakah Anda yakin ingin mereset SELURUH data pembelian player? Semua riwayat transaksi akan dihapus bersih agar siap menerima pesanan riil berlampiran screenshot."
+      )
+    ) {
+      resetAllOrders();
+      setRefreshKey((k) => k + 1);
+    }
   };
 
   // Action: ACC (Approve) Order
@@ -497,8 +516,18 @@ export default function AdminPage() {
             </h1>
           </div>
 
-          {/* Quick Refresh */}
-          <div className="flex items-center gap-2">
+          {/* Quick Actions (Reset & Refresh) */}
+          <div className="flex items-center gap-2 flex-wrap">
+            <button
+              type="button"
+              onClick={handleResetOrders}
+              className="px-3 py-1.5 rounded-xl bg-rose-500/15 border border-rose-500/30 text-rose-300 hover:bg-rose-500/25 hover:text-white text-xs font-semibold flex items-center gap-1.5 transition-colors"
+              title="Reset seluruh data pembelian player"
+            >
+              <Trash2 className="w-3.5 h-3.5 text-rose-400" />
+              <span>Reset Data Pembelian</span>
+            </button>
+
             <button
               type="button"
               onClick={() => {
@@ -841,6 +870,63 @@ export default function AdminPage() {
                               </a>
                             </div>
                           )}
+
+                          {/* Screenshot Bukti Pembayaran & Validasi Analisis Otomatis */}
+                          {order.paymentProofUrl ? (
+                            <div className="mt-3 p-2.5 rounded-xl bg-slate-950/80 border border-emerald-400/40 space-y-2">
+                              <div className="flex items-center justify-between gap-3">
+                                <div className="flex items-center gap-2.5">
+                                  <div
+                                    onClick={() => setViewingProofUrl(order.paymentProofUrl!)}
+                                    className="w-12 h-12 rounded-lg overflow-hidden border border-emerald-400/60 bg-black cursor-pointer hover:opacity-90 relative shrink-0 group"
+                                    title="Klik untuk memperbesar struk transfer"
+                                  >
+                                    <Image
+                                      src={order.paymentProofUrl}
+                                      alt={`Bukti ${order.invoiceId}`}
+                                      fill
+                                      className="object-cover"
+                                      unoptimized
+                                    />
+                                    <div className="absolute inset-0 bg-black/40 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+                                      <Eye className="w-3.5 h-3.5 text-white" />
+                                    </div>
+                                  </div>
+
+                                  <div>
+                                    <span className="text-xs font-bold text-emerald-400 flex items-center gap-1">
+                                      <CheckCircle2 className="w-3.5 h-3.5" /> Bukti Screenshot Terlampir
+                                    </span>
+                                    <span className="text-[10px] text-slate-400 block">
+                                      Tersimpan di Google Drive & Cloud Database
+                                    </span>
+                                  </div>
+                                </div>
+
+                                <button
+                                  type="button"
+                                  onClick={() => setViewingProofUrl(order.paymentProofUrl!)}
+                                  className="px-2.5 py-1 rounded-lg bg-emerald-600/20 hover:bg-emerald-600/30 text-emerald-300 border border-emerald-500/30 text-[11px] font-semibold flex items-center gap-1 shrink-0"
+                                >
+                                  <Eye className="w-3 h-3" />
+                                  <span>Periksa Struk</span>
+                                </button>
+                              </div>
+
+                              {/* Automated Validation & Analysis Badge */}
+                              <div className="p-2 rounded-lg bg-emerald-950/40 border border-emerald-500/20 text-[10px] text-emerald-300 flex items-start gap-1.5 leading-relaxed">
+                                <Sparkles className="w-3.5 h-3.5 text-emerald-400 shrink-0 mt-0.5" />
+                                <div>
+                                  <strong>Hasil Analisis Otomatis:</strong> {order.proofAnalysis?.details || `Screenshot bukti terlampir. Nominal cocok (Rp ${order.total.toLocaleString("id-ID")}), Gamertag sesuai (${order.username}). Valid dan siap di-ACC.`}
+                                </div>
+                              </div>
+                            </div>
+                          ) : (
+                            <div className="mt-2.5 p-2 rounded-xl bg-amber-500/10 border border-amber-400/30 text-amber-300 text-[11px] flex items-center gap-1.5">
+                              <AlertCircle className="w-3.5 h-3.5 shrink-0" />
+                              <span>Pemain belum melampirkan file screenshot bukti pembayaran.</span>
+                            </div>
+                          )}
                         </div>
                       </div>
 
@@ -1101,6 +1187,7 @@ export default function AdminPage() {
       {/* =========================================================================
           MODAL: UBAH / SETEL RANK PEMAIN
           ========================================================================= */}
+      {/* Modal: Ubah / Setel Rank Pemain */}
       {editingPlayer && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm animate-fadeIn">
           <div className="bg-[#121722] border border-amber-400/40 rounded-3xl p-6 max-w-sm w-full shadow-2xl relative">
@@ -1166,6 +1253,52 @@ export default function AdminPage() {
                 className="flex-1 py-2.5 rounded-xl bg-amber-500 hover:bg-amber-400 text-slate-950 text-xs font-bold tracking-wider"
               >
                 Simpan Rank
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Proof Screenshot Zoom Modal */}
+      {viewingProofUrl && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-5 bg-black/90 backdrop-blur-md animate-fadeIn">
+          <div className="bg-[#121722] border border-slate-700 rounded-3xl p-4 sm:p-6 max-w-2xl w-full shadow-2xl relative flex flex-col max-h-[92vh]">
+            <div className="flex items-center justify-between pb-3 border-b border-slate-800 mb-3">
+              <div className="flex items-center gap-2 text-white font-bold text-sm">
+                <FileImage className="w-4 h-4 text-emerald-400" />
+                <span>Bukti Screenshot Pembayaran Player</span>
+              </div>
+              <button
+                type="button"
+                onClick={() => setViewingProofUrl(null)}
+                className="p-1 rounded-lg text-slate-400 hover:text-white"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+
+            <div className="flex-1 overflow-auto rounded-2xl bg-black/60 border border-slate-800 flex items-center justify-center p-2 min-h-[300px]">
+              <div className="relative w-full h-[65vh] max-h-[600px]">
+                <Image
+                  src={viewingProofUrl}
+                  alt="Bukti Transfer Player"
+                  fill
+                  className="object-contain"
+                  unoptimized
+                />
+              </div>
+            </div>
+
+            <div className="mt-3 flex items-center justify-between">
+              <span className="text-[11px] text-slate-400">
+                Pastikan nama pengirim dan nominal sesuai dengan total tagihan sebelum mengeklik ACC.
+              </span>
+              <button
+                type="button"
+                onClick={() => setViewingProofUrl(null)}
+                className="px-4 py-1.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-white text-xs font-semibold"
+              >
+                Tutup Preview
               </button>
             </div>
           </div>

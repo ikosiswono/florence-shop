@@ -59,9 +59,10 @@ function setupDatabaseSheets() {
       "Status Transaksi",
       "Waktu Pembelian",
       "Nomor WhatsApp",
-      "LuckPerms Console Command"
+      "LuckPerms Console Command",
+      "Link Bukti Screenshot (Google Drive)"
     ]);
-    orderSheet.getRange(1, 1, 1, 10).setBackground("#d4af37").setFontColor("#000000").setFontWeight("bold");
+    orderSheet.getRange(1, 1, 1, 11).setBackground("#d4af37").setFontColor("#000000").setFontWeight("bold");
     orderSheet.setFrozenRows(1);
   }
 
@@ -124,16 +125,71 @@ function doPost(e) {
       output.success = true;
       output.message = "Invoice order berhasil dicatat di Google Sheets.";
     }
-    else if (action === "complete_order") {
+    else if (action === "submit_proof") {
+      var driveUrl = "-";
+      try {
+        if (payload.proofBase64 && payload.proofBase64.indexOf("base64,") !== -1) {
+          var base64Data = payload.proofBase64.split("base64,")[1];
+          var decoded = Utilities.base64Decode(base64Data);
+          var blob = Utilities.newBlob(decoded, "image/jpeg", "BUKTI_" + payload.invoiceId + "_" + payload.gamertag + ".jpg");
+          
+          // Folder Google Drive khusus untuk Bukti Pembayaran
+          var folderName = "Florence Shop Bukti Transfer";
+          var folders = DriveApp.getFoldersByName(folderName);
+          var targetFolder = folders.hasNext() ? folders.next() : DriveApp.createFolder(folderName);
+          
+          var driveFile = targetFolder.createFile(blob);
+          driveFile.setSharing(DriveApp.Access.ANYONE_WITH_LINK, DriveApp.Permission.VIEW);
+          driveUrl = driveFile.getUrl();
+        }
+      } catch (driveErr) {
+        driveUrl = "Upload error: " + driveErr.toString();
+      }
+
+      var ordersData = orderSheet.getDataRange().getValues();
+      var foundRow = -1;
+      for (var r = 1; r < ordersData.length; r++) {
+        if (ordersData[r][1] === payload.invoiceId) {
+          foundRow = r + 1;
+          break;
+        }
+      }
+
+      if (foundRow !== -1) {
+        orderSheet.getRange(foundRow, 7).setValue("PENDING (MENUNGGU ACC)");
+        if (orderSheet.getLastColumn() >= 11) {
+          orderSheet.getRange(foundRow, 11).setValue(driveUrl);
+        }
+      } else {
+        orderSheet.appendRow([
+          new Date(),
+          payload.invoiceId,
+          payload.gamertag,
+          payload.items || "Rank Florence Network",
+          payload.total,
+          payload.paymentMethod,
+          "PENDING (MENUNGGU ACC)",
+          new Date().toISOString(),
+          payload.phone || "-",
+          "lp user " + payload.gamertag + " parent add vip",
+          driveUrl
+        ]);
+      }
+
+      output.success = true;
+      output.driveUrl = driveUrl;
+      output.message = "Bukti screenshot berhasil diunggah ke Google Drive & tercatat di Google Sheets.";
+    }
+    else if (action === "admin_acc_order" || action === "complete_order") {
       var ordersData = orderSheet.getDataRange().getValues();
       for (var j = 1; j < ordersData.length; j++) {
         if (ordersData[j][1] === payload.invoiceId) {
-          orderSheet.getRange(j + 1, 7).setValue("COMPLETED"); // Kolom Status
+          orderSheet.getRange(j + 1, 7).setValue("COMPLETED (DI-ACC)"); // Kolom Status
           break;
         }
       }
       output.success = true;
-      output.message = "Status order berhasil diubah menjadi LUNAS (COMPLETED).";
+      output.message = "Status order berhasil di-ACC resmi oleh Admin.";
     }
     else if (action === "update_profile") {
       var allUsers = userSheet.getDataRange().getValues();

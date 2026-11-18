@@ -34,7 +34,11 @@ import {
   Printer,
   Smartphone,
   Eye,
-  Edit3
+  Edit3,
+  Shirt,
+  UploadCloud,
+  X,
+  AlertCircle
 } from "lucide-react";
 import { useShop } from "@/context/ShopContext";
 import { CONFIG, PRODUCTS, formatRupiah } from "@/data/products";
@@ -44,6 +48,7 @@ import CartDrawer from "@/components/CartDrawer";
 import CheckoutModal from "@/components/CheckoutModal";
 import PaymentModal from "@/components/PaymentModal";
 import AuthModal from "@/components/AuthModal";
+import MinecraftSkinViewer from "@/components/MinecraftSkinViewer";
 
 export default function DashboardPage() {
   const { 
@@ -57,7 +62,8 @@ export default function DashboardPage() {
     showToast,
     setIsAuthOpen,
     setAuthMode,
-    updateUserProfile
+    updateUserProfile,
+    updateUserCustomSkin
   } = useShop();
 
   const [activeTab, setActiveTab] = useState<
@@ -67,6 +73,13 @@ export default function DashboardPage() {
   const [searchQuery, setSearchQuery] = useState("");
   const [copiedIP, setCopiedIP] = useState(false);
   const [copiedCmd, setCopiedCmd] = useState<string | null>(null);
+
+  // Custom Skin Upload State
+  const [isSkinModalOpen, setIsSkinModalOpen] = useState(false);
+  const [customSkinPreview, setCustomSkinPreview] = useState<string | null>(null);
+  const [detectedFormat, setDetectedFormat] = useState<"64x64" | "128x128" | null>(null);
+  const [skinUploadError, setSkinUploadError] = useState<string | null>(null);
+  const [isSavingSkin, setIsSavingSkin] = useState(false);
 
   // Real Buyers Data (Fetched dynamically from Google Sheets via Apps Script / local store orders)
   const [spreadsheetBuyers, setSpreadsheetBuyers] = useState<any[]>([]);
@@ -163,6 +176,70 @@ export default function DashboardPage() {
       setIsSavingProfile(false);
     }
   };
+
+  // Handle Skin File Upload (Bedrock 64x64 or 128x128 HD)
+  const handleSkinFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    setSkinUploadError(null);
+    if (!file) return;
+
+    if (!file.type.includes("png")) {
+      setSkinUploadError("Format file skin wajib berupa file gambar PNG (Minecraft Bedrock Skin).");
+      return;
+    }
+
+    const reader = new FileReader();
+    reader.onload = (event) => {
+      const dataUrl = event.target?.result as string;
+      const testImg = new window.Image();
+      testImg.src = dataUrl;
+      testImg.onload = () => {
+        const w = testImg.width;
+        const h = testImg.height;
+        if ((w === 64 && h === 64) || (w === 64 && h === 32)) {
+          setDetectedFormat("64x64");
+          setCustomSkinPreview(dataUrl);
+        } else if (w === 128 && h === 128) {
+          setDetectedFormat("128x128");
+          setCustomSkinPreview(dataUrl);
+        } else {
+          setSkinUploadError(
+            `Dimensi gambar skin Anda (${w}x${h}px) tidak standar. Minecraft Bedrock mewajibkan ukuran 64x64 piksel atau 128x128 piksel HD.`
+          );
+        }
+      };
+    };
+    reader.readAsDataURL(file);
+  };
+
+  // Save Custom Minecraft Skin
+  const handleSaveCustomSkin = async () => {
+    if (!customSkinPreview) return;
+    setIsSavingSkin(true);
+    try {
+      await updateUserCustomSkin(customSkinPreview, detectedFormat || "64x64");
+      setIsSkinModalOpen(false);
+    } finally {
+      setIsSavingSkin(false);
+    }
+  };
+
+  // Rank Benefits matching purchased active rank
+  const currentRankBenefits = useMemo(() => {
+    if (currentUser?.activeBenefits && currentUser.activeBenefits.length > 0) {
+      return currentUser.activeBenefits;
+    }
+    const matched = PRODUCTS.find(
+      (p) => p.name.toLowerCase() === (currentUser?.rank || "").toLowerCase()
+    );
+    if (matched) return matched.benefits;
+    return [
+      "Perintah Chat Dasar: +spawn, +tpa, +sethome",
+      "Bonus Saldo Koin Survival Server",
+      "Kit Peralatan Pemula Survival",
+      "Akses Area Klaim Tanah (Land Claim)"
+    ];
+  }, [currentUser]);
 
   // Commands Cheat Sheet based on rank
   const activeCommands = useMemo(() => {
@@ -515,60 +592,100 @@ export default function DashboardPage() {
           {activeTab === "dashboard" && (
             <div className="space-y-6 animate-fadeIn">
               
-              {/* TOP SPLIT: HERO SPOTLIGHT (Left 65%) + IN LIBRARY BENEFIT (Right 35%) */}
-              <div className="grid grid-cols-1 lg:grid-cols-12 gap-5">
+              {/* TOP SPLIT: SKIN AVATAR (Left 5 Cols) + STATUS RANK & LIST BENEFIT (Right 7 Cols) */}
+              <div className="grid grid-cols-1 lg:grid-cols-12 gap-5 items-stretch">
                 
-                {/* 1. HERO SPOTLIGHT CARD (Matches Reference Image) */}
-                <div className="lg:col-span-8 rounded-3xl relative overflow-hidden bg-gradient-to-r from-[#170a24] via-[#240e36] to-[#140822] border border-[#3d1957] p-6 sm:p-8 flex flex-col justify-between shadow-[0_12px_40px_rgba(0,0,0,0.6)] min-h-[300px]">
-                  
-                  {/* Background Artwork */}
-                  <div className="absolute right-0 top-0 bottom-0 w-1/2 opacity-30 pointer-events-none select-none overflow-hidden hidden sm:block">
-                    <Image
-                      src="/assets/characters/character-warrior.webp"
-                      alt="Hero Artwork"
-                      fill
-                      className="object-cover object-left"
+                {/* 1. MINECRAFT BEDROCK 3D SKIN AVATAR (FULLBODY ANIMATED WALKING) */}
+                <div className="lg:col-span-5 rounded-3xl bg-[#130b20] border border-[#2b173d] p-5 flex flex-col justify-between shadow-xl">
+                  <div>
+                    <div className="flex items-center justify-between pb-3 border-b border-[#2b173d] mb-3">
+                      <div className="flex items-center gap-2">
+                        <Shirt className="w-4 h-4 text-cyan-400" />
+                        <span className="font-cinzel text-xs font-bold text-white tracking-wider uppercase">
+                          AVATAR SKIN BEDROCK
+                        </span>
+                      </div>
+                      <span className="text-[10px] font-mono text-emerald-400 font-bold px-2 py-0.5 rounded bg-emerald-500/10 border border-emerald-500/20">
+                        {currentUser.skinFormat || "64x64 / 128x128"}
+                      </span>
+                    </div>
+
+                    {/* Interactive Animated Walking Skin Viewer */}
+                    <MinecraftSkinViewer
+                      skinUrl={currentUser.customSkinUrl}
+                      gamertag={currentUser.gamertag}
+                      height={300}
                     />
-                    <div className="absolute inset-0 bg-gradient-to-r from-[#170a24] via-[#170a24]/60 to-transparent" />
                   </div>
 
-                  {/* Top Tags */}
-                  <div className="relative z-10 flex items-center gap-2 mb-3">
-                    <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-amber-400/20 border border-amber-300/40 text-amber-300 text-[10px] font-montserrat font-bold uppercase tracking-wider">
-                      <Sparkles className="w-3 h-3 text-amber-400" />
-                      AKTIF SELAMA TEMA BERJALAN (PER-TEMA SERVER)
+                  <div className="pt-3 border-t border-[#2b173d] flex items-center justify-between gap-2 mt-3">
+                    <span className="text-[11px] text-slate-400">
+                      Skin Bedrock 64x64 & 128x128 HD
                     </span>
-
-                    <span className="px-2.5 py-1 rounded-full bg-emerald-500/20 text-emerald-300 text-[10px] font-mono font-bold">
-                      ✓ WHITELIST TERVERIFIKASI
-                    </span>
+                    <button
+                      type="button"
+                      onClick={() => setIsSkinModalOpen(true)}
+                      className="px-3.5 py-1.5 rounded-xl bg-gradient-to-r from-cyan-600 to-blue-600 hover:from-cyan-500 hover:to-blue-500 text-white text-xs font-montserrat font-bold flex items-center gap-1.5 shadow-md transition-all"
+                    >
+                      <Shirt className="w-3.5 h-3.5" />
+                      <span>Edit / Ganti Skin</span>
+                    </button>
                   </div>
+                </div>
 
-                  {/* Title & Lore */}
-                  <div className="relative z-10 max-w-md space-y-2 mb-6">
-                    <h2 className="font-cinzel text-2xl sm:text-3xl font-black text-white tracking-wide leading-tight">
-                      Selamat Datang, {currentUser.gamertag}!
+                {/* 2. STATUS PEMBELIAN RANK & DAFTAR BENEFIT RESMI SERVER */}
+                <div className="lg:col-span-7 rounded-3xl bg-gradient-to-r from-[#170a24] via-[#240e36] to-[#140822] border border-[#3d1957] p-6 sm:p-7 flex flex-col justify-between shadow-xl">
+                  <div>
+                    {/* Top Status Badges */}
+                    <div className="flex items-center gap-2 flex-wrap mb-3">
+                      <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-amber-400/20 border border-amber-300/40 text-amber-300 text-[10px] font-montserrat font-bold uppercase tracking-wider">
+                        <Crown className="w-3.5 h-3.5 text-amber-400" />
+                        RANK: {currentUser.rank || "Member"}
+                      </span>
+                      <span className="px-2.5 py-1 rounded-full bg-emerald-500/20 text-emerald-300 text-[10px] font-mono font-bold border border-emerald-500/30">
+                        ✓ RESMI DIAKTIFKAN OLEH ADMIN
+                      </span>
+                      <span className="px-2.5 py-1 rounded-full bg-cyan-500/20 text-cyan-300 text-[10px] font-mono font-bold">
+                        AKTIF SELAMA TEMA BERJALAN
+                      </span>
+                    </div>
+
+                    <h2 className="font-cinzel text-xl sm:text-2xl font-black text-white tracking-wide">
+                      Fasilitas & Benefit Resmi Akun Anda
                     </h2>
-                    <p className="text-xs text-slate-300 font-sans leading-relaxed">
-                      Status akun Anda aktif di server Minecraft Bedrock Florence Network. Rank berlaku aktif selama tema server saat ini berlangsung hingga pergantian tema server berikutnya. Nikmati perintah in-game khusus dan akses brankas eksklusif.
+                    <p className="text-xs text-slate-300 font-sans mt-1 leading-relaxed">
+                      Selamat datang, <strong>{currentUser.gamertag}</strong>! Seluruh perintah in-game khusus, bonus saldo koin, dan perlengkapan survival di bawah ini aktif otomatis di server Florence Network sesuai hasil ACC Admin.
                     </p>
+
+                    {/* Dynamic List of Benefits */}
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 mt-4 max-h-[190px] overflow-y-auto pr-1">
+                      {currentRankBenefits.map((benefit, idx) => (
+                        <div
+                          key={idx}
+                          className="flex items-start gap-2 p-2.5 rounded-xl bg-[#1b102c]/90 border border-[#381c53] text-xs text-slate-200"
+                        >
+                          <CheckCircle2 className="w-4 h-4 text-emerald-400 shrink-0 mt-0.5" />
+                          <span className="leading-snug">{benefit}</span>
+                        </div>
+                      ))}
+                    </div>
                   </div>
 
-                  {/* Quick Action Button & Season Countdown */}
-                  <div className="relative z-10 flex flex-wrap items-center gap-3">
+                  {/* Quick Action Buttons */}
+                  <div className="pt-4 mt-4 border-t border-white/10 flex items-center justify-between gap-3 flex-wrap">
                     <Link
                       href="/#katalog"
-                      className="px-6 py-3 rounded-2xl bg-gradient-to-r from-red-600 via-rose-600 to-red-700 text-white font-montserrat font-bold text-xs tracking-wider uppercase shadow-[0_4px_20px_rgba(225,29,72,0.4)] hover:scale-105 active:scale-95 transition-all flex items-center gap-2"
+                      className="px-5 py-2.5 rounded-xl bg-gradient-to-r from-red-600 via-rose-600 to-red-700 text-white font-montserrat font-bold text-xs tracking-wider uppercase shadow-[0_4px_20px_rgba(225,29,72,0.4)] hover:scale-105 active:scale-95 transition-all flex items-center gap-2"
                     >
                       <Sparkles className="w-4 h-4" />
-                      <span>UPGRADE / PERPANJANG RANK</span>
+                      <span>UPGRADE / BELI RANK LAIN</span>
                     </Link>
 
                     {userOrders.length > 0 && (
                       <button
                         type="button"
                         onClick={() => handleOpenReceipt(userOrders[0])}
-                        className="px-4 py-3 rounded-2xl bg-slate-900/80 border border-amber-300/40 text-amber-300 hover:text-white text-xs font-montserrat font-bold transition-all flex items-center gap-1.5"
+                        className="px-4 py-2.5 rounded-xl bg-slate-900/80 border border-amber-300/40 text-amber-300 hover:text-white text-xs font-montserrat font-bold transition-all flex items-center gap-1.5"
                       >
                         <Receipt className="w-4 h-4 text-amber-400" />
                         <span>Kwitansi Terakhir</span>
@@ -578,60 +695,52 @@ export default function DashboardPage() {
 
                 </div>
 
-                {/* 2. IN LIBRARY / PERINTAH CHAT AKTIF (Matches Reference Image Right Column) */}
-                <div className="lg:col-span-4 rounded-3xl bg-[#130b20] border border-[#2b173d] p-5 flex flex-col justify-between shadow-lg">
-                  <div>
-                    <div className="flex items-center justify-between pb-3 border-b border-[#2b173d] mb-3">
-                      <span className="font-cinzel text-xs font-bold text-white tracking-wider uppercase">
-                        PERINTAH CHAT AKTIF
-                      </span>
-                      <span className="text-[10px] font-mono text-cyan-400 font-bold">
-                        FORMAT: +cmd
-                      </span>
-                    </div>
+              </div>
 
-                    <div className="space-y-2 max-h-[220px] overflow-y-auto pr-1 scrollbar-none">
-                      {activeCommands.map((item) => (
-                        <div
-                          key={item.cmd}
-                          className="flex items-center justify-between p-2 rounded-xl bg-[#1b102c] border border-[#381c53] hover:border-cyan-400/50 transition-all"
-                        >
-                          <div className="flex items-center gap-2.5 overflow-hidden">
-                            <span className="text-base select-none">{item.icon}</span>
-                            <div className="overflow-hidden">
-                              <span className="font-mono text-xs font-black text-emerald-400 block truncate">
-                                {item.cmd}
-                              </span>
-                              <span className="text-[9px] text-slate-400 block truncate max-w-[150px]">
-                                {item.desc}
-                              </span>
-                            </div>
-                          </div>
-
-                          <button
-                            type="button"
-                            onClick={() => copyCommandText(item.cmd)}
-                            className="p-1.5 rounded-lg bg-black/40 hover:bg-emerald-500/20 text-slate-400 hover:text-emerald-300 transition-colors shrink-0"
-                            title="Salin perintah"
-                          >
-                            {copiedCmd === item.cmd ? (
-                              <Check className="w-3.5 h-3.5 text-emerald-400" />
-                            ) : (
-                              <Copy className="w-3.5 h-3.5" />
-                            )}
-                          </button>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-
-                  <div className="pt-3 border-t border-[#2b173d] text-[10px] text-slate-400 flex items-center justify-between">
-                    <span>Aktivasi in-game:</span>
-                    <strong className="text-amber-300 font-mono">Chatbox Minecraft Bedrock</strong>
-                  </div>
-
+              {/* PERINTAH CHAT IN-GAME AKTIF */}
+              <div className="rounded-3xl bg-[#130b20] border border-[#2b173d] p-5 shadow-lg">
+                <div className="flex items-center justify-between pb-3 border-b border-[#2b173d] mb-3">
+                  <span className="font-cinzel text-xs font-bold text-white tracking-wider uppercase">
+                    DAFTAR PERINTAH CHATBOX RESMI SERVER (FORMAT: +cmd)
+                  </span>
+                  <span className="text-[10px] font-mono text-cyan-400 font-bold">
+                    KLIK UNTUK SALIN PERINTAH
+                  </span>
                 </div>
 
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2.5">
+                  {activeCommands.map((item) => (
+                    <div
+                      key={item.cmd}
+                      className="flex items-center justify-between p-2.5 rounded-xl bg-[#1b102c] border border-[#381c53] hover:border-cyan-400/50 transition-all"
+                    >
+                      <div className="flex items-center gap-2.5 overflow-hidden">
+                        <span className="text-base select-none">{item.icon}</span>
+                        <div className="overflow-hidden">
+                          <span className="font-mono text-xs font-black text-emerald-400 block truncate">
+                            {item.cmd}
+                          </span>
+                          <span className="text-[10px] text-slate-400 block truncate max-w-[170px]">
+                            {item.desc}
+                          </span>
+                        </div>
+                      </div>
+
+                      <button
+                        type="button"
+                        onClick={() => copyCommandText(item.cmd)}
+                        className="p-1.5 rounded-lg bg-black/40 hover:bg-emerald-500/20 text-slate-400 hover:text-emerald-300 transition-colors shrink-0"
+                        title="Salin perintah"
+                      >
+                        {copiedCmd === item.cmd ? (
+                          <Check className="w-3.5 h-3.5 text-emerald-400" />
+                        ) : (
+                          <Copy className="w-3.5 h-3.5" />
+                        )}
+                      </button>
+                    </div>
+                  ))}
+                </div>
               </div>
 
               {/* BOTTOM SECTION: "YOU MIGHT ALSO LIKE" / REKOMENDASI RANK MUSIM INI (Matches Reference Image Bottom Row) */}
@@ -1049,6 +1158,103 @@ export default function DashboardPage() {
         </main>
 
       </div>
+
+      {/* Modal: Upload / Ganti Custom Minecraft Skin Bedrock */}
+      {isSkinModalOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-black/85 backdrop-blur-md animate-fadeIn">
+          <div className="bg-[#120a1c] border border-cyan-400/40 rounded-3xl p-5 sm:p-7 max-w-md w-full shadow-2xl relative font-sans">
+            <button
+              type="button"
+              onClick={() => {
+                setIsSkinModalOpen(false);
+                setSkinUploadError(null);
+                setCustomSkinPreview(null);
+              }}
+              className="absolute top-4 right-4 p-1.5 rounded-lg text-slate-400 hover:text-white"
+            >
+              <X className="w-5 h-5" />
+            </button>
+
+            <div className="text-center mb-4">
+              <div className="w-12 h-12 mx-auto mb-2 rounded-2xl bg-cyan-500/20 border border-cyan-400/40 flex items-center justify-center text-cyan-300 shadow-glow">
+                <Shirt className="w-6 h-6" />
+              </div>
+              <h3 className="font-cinzel text-lg font-bold text-white">
+                Ganti Skin Avatar Bedrock
+              </h3>
+              <p className="text-xs text-slate-400 mt-1">
+                Unggah file gambar skin Minecraft Bedrock Anda (Format PNG ukuran <strong>64x64</strong> standar atau <strong>128x128 HD</strong>).
+              </p>
+            </div>
+
+            {/* File Upload Box */}
+            <div className="mb-4">
+              <label className="border-2 border-dashed border-cyan-400/40 hover:border-cyan-400 rounded-2xl p-4 flex flex-col items-center justify-center gap-2 cursor-pointer bg-slate-950/60 hover:bg-slate-900/80 transition-all text-center">
+                <UploadCloud className="w-8 h-8 text-cyan-400" />
+                <span className="text-xs font-bold text-white">
+                  Pilih File PNG Skin Minecraft
+                </span>
+                <span className="text-[10px] text-slate-400">
+                  Dukung Minecraft Bedrock 64x64 & 128x128 HD
+                </span>
+                <input
+                  type="file"
+                  accept="image/png"
+                  onChange={handleSkinFileSelect}
+                  className="hidden"
+                />
+              </label>
+            </div>
+
+            {/* Error Message */}
+            {skinUploadError && (
+              <div className="mb-4 p-3 rounded-xl bg-rose-500/20 border border-rose-500/40 text-rose-200 text-xs flex items-start gap-2">
+                <AlertCircle className="w-4 h-4 text-rose-300 shrink-0 mt-0.5" />
+                <span>{skinUploadError}</span>
+              </div>
+            )}
+
+            {/* Live Animated Walking Preview of Uploaded Skin */}
+            {customSkinPreview && (
+              <div className="mb-4 p-3 rounded-2xl bg-slate-950/80 border border-emerald-400/40">
+                <div className="flex items-center justify-between text-xs text-emerald-400 font-bold mb-2">
+                  <span className="flex items-center gap-1.5">
+                    <CheckCircle2 className="w-4 h-4" /> File Valid: Format {detectedFormat}
+                  </span>
+                  <span className="text-[10px] text-slate-400 font-mono">Live Walk Preview</span>
+                </div>
+                <MinecraftSkinViewer
+                  skinUrl={customSkinPreview}
+                  gamertag={currentUser.gamertag}
+                  height={220}
+                />
+              </div>
+            )}
+
+            <div className="flex gap-2">
+              <button
+                type="button"
+                onClick={() => {
+                  setIsSkinModalOpen(false);
+                  setSkinUploadError(null);
+                  setCustomSkinPreview(null);
+                }}
+                className="flex-1 py-2.5 rounded-xl border border-slate-700 text-slate-300 text-xs font-bold hover:text-white"
+              >
+                Batal
+              </button>
+              <button
+                type="button"
+                onClick={handleSaveCustomSkin}
+                disabled={!customSkinPreview || isSavingSkin}
+                className="flex-1 py-2.5 rounded-xl bg-gradient-to-r from-emerald-500 to-emerald-600 hover:from-emerald-400 hover:to-emerald-500 text-slate-950 text-xs font-black tracking-wider disabled:opacity-50 transition-all shadow-md"
+              >
+                {isSavingSkin ? "Menyimpan Skin..." : "Simpan & Terapkan Skin"}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Global Modals Mounted */}
       <InvoicePrintModal />
