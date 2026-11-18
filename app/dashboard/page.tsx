@@ -40,7 +40,8 @@ import {
   X,
   AlertCircle,
   Plus,
-  Play
+  Play,
+  Menu
 } from "lucide-react";
 import { useShop } from "@/context/ShopContext";
 import { CONFIG, PRODUCTS, formatRupiah } from "@/data/products";
@@ -97,6 +98,7 @@ export default function DashboardPage() {
 
   // Hero carousel slide index
   const [heroSlide, setHeroSlide] = useState(1);
+  const [isMobileDrawerOpen, setIsMobileDrawerOpen] = useState(false);
 
   // Real Buyers Data from Apps Script or localStorage
   const [spreadsheetBuyers, setSpreadsheetBuyers] = useState<any[]>([]);
@@ -357,11 +359,6 @@ export default function DashboardPage() {
             </p>
           </div>
 
-          <div className="p-3.5 rounded-2xl bg-black/40 border border-white/5 text-[11px] text-slate-400 flex items-center gap-2.5 text-left">
-            <ShieldCheck className="w-4 h-4 text-emerald-400 shrink-0" />
-            <span>Sistem dilengkapi proteksi anti-hack, hashing password SHA-256 + Salt, dan verifikasi whitelist.</span>
-          </div>
-
           <div className="space-y-3 pt-2">
             <button
               type="button"
@@ -407,12 +404,172 @@ export default function DashboardPage() {
     <div className="min-h-screen bg-[#110617] text-slate-100 flex p-2 sm:p-3 lg:p-5 font-sans select-none overflow-x-hidden">
       
       {/* Outer Cockpit Container with Exact Reference Plum/Wine Palette & Rounding */}
-      <div className="w-full max-w-[1580px] mx-auto bg-[#1a0a24]/95 border border-[#30133c] rounded-[26px] sm:rounded-[34px] shadow-[0_20px_90px_rgba(0,0,0,0.85)] flex flex-col lg:flex-row overflow-hidden relative backdrop-blur-2xl">
+      <div className="w-full max-w-[1580px] mx-auto bg-[#1a0a24]/95 border border-[#30133c] rounded-[20px] sm:rounded-[34px] shadow-[0_20px_90px_rgba(0,0,0,0.85)] flex flex-row overflow-hidden relative backdrop-blur-2xl min-h-[92vh]">
         
         {/* ===================================================================
-            LEFT SIDEBAR (EXACT MATCH TO REFERENCE IMAGE 1)
+            1. MOBILE COMPACT LEFT RAIL (Always on the Left for Mobile / HP)
            =================================================================== */}
-        <aside className="w-full lg:w-60 bg-[#16081e]/95 border-b lg:border-b-0 lg:border-r border-[#2b0f38] p-4 sm:p-5 flex flex-col justify-between shrink-0">
+        <aside className="flex lg:hidden w-14 sm:w-16 bg-[#16081e]/95 border-r border-[#2b0f38] py-3.5 px-1.5 flex-col justify-between items-center shrink-0 z-30">
+          <div className="flex flex-col items-center gap-3 w-full">
+            {/* Florence Network Mini Logo */}
+            <button
+              type="button"
+              onClick={() => setActiveTab("dashboard")}
+              className="relative w-9 h-9 rounded-xl bg-gradient-to-br from-red-600/30 to-purple-900/40 border border-red-500/40 p-1 flex items-center justify-center shrink-0 hover:scale-105 transition-transform"
+              title="Florence Network"
+            >
+              <Image
+                src="/assets/logo/florence-network-logo.png"
+                alt="Florence Network"
+                width={26}
+                height={26}
+                className="object-contain"
+              />
+            </button>
+
+            {/* Toggle Full Drawer Button */}
+            <button
+              type="button"
+              onClick={() => setIsMobileDrawerOpen(true)}
+              className="p-2 rounded-xl bg-white/5 hover:bg-white/10 text-slate-300 hover:text-white transition-colors"
+              title="Buka Menu Lengkap"
+            >
+              <Menu className="w-4 h-4" />
+            </button>
+
+            <div className="w-8 border-t border-[#2b0f38] my-1" />
+
+            {/* Vertical Icons Nav */}
+            <div className="flex flex-col items-center gap-1.5 w-full">
+              {/* Dashboard */}
+              <button
+                type="button"
+                onClick={() => setActiveTab("dashboard")}
+                title="My Dashboard"
+                className={`w-10 h-10 rounded-xl flex items-center justify-center transition-all ${
+                  activeTab === "dashboard"
+                    ? "bg-[#e11d48] text-white shadow-[0_4px_16px_rgba(225,29,72,0.45)]"
+                    : "text-slate-400 hover:text-white hover:bg-white/5"
+                }`}
+              >
+                <LayoutDashboard className="w-4 h-4" />
+              </button>
+
+              {/* Game's List */}
+              <button
+                type="button"
+                onClick={() => setActiveTab("ranks")}
+                title="Game's List"
+                className={`w-10 h-10 rounded-xl flex items-center justify-center transition-all ${
+                  activeTab === "ranks"
+                    ? "bg-[#e11d48] text-white shadow-[0_4px_16px_rgba(225,29,72,0.45)]"
+                    : "text-slate-400 hover:text-white hover:bg-white/5"
+                }`}
+              >
+                <Gamepad2 className="w-4 h-4" />
+              </button>
+
+              {/* Explore Store */}
+              <Link
+                href="/#katalog"
+                title="Explore Store"
+                className="w-10 h-10 rounded-xl flex items-center justify-center text-slate-400 hover:text-white hover:bg-white/5 transition-all"
+              >
+                <ShoppingBag className="w-4 h-4" />
+              </Link>
+
+              {/* Purchased */}
+              <button
+                type="button"
+                onClick={() => setActiveTab("purchased")}
+                title="Purchased"
+                className={`relative w-10 h-10 rounded-xl flex items-center justify-center transition-all ${
+                  activeTab === "purchased"
+                    ? "bg-[#e11d48] text-white shadow-[0_4px_16px_rgba(225,29,72,0.45)]"
+                    : "text-slate-400 hover:text-white hover:bg-white/5"
+                }`}
+              >
+                <Receipt className="w-4 h-4" />
+                {userOrders.length > 0 && (
+                  <span className="absolute top-1.5 right-1.5 w-2 h-2 rounded-full bg-red-400" />
+                )}
+              </button>
+
+              {/* Friends */}
+              <button
+                type="button"
+                onClick={() => setActiveTab("friends")}
+                title="Friends (Whitelist)"
+                className={`relative w-10 h-10 rounded-xl flex items-center justify-center transition-all ${
+                  activeTab === "friends"
+                    ? "bg-[#e11d48] text-white shadow-[0_4px_16px_rgba(225,29,72,0.45)]"
+                    : "text-slate-400 hover:text-white hover:bg-white/5"
+                }`}
+              >
+                <Users className="w-4 h-4" />
+                <span className="absolute bottom-1.5 right-1.5 w-1.5 h-1.5 rounded-full bg-emerald-400" />
+              </button>
+
+              {/* Payments */}
+              <button
+                type="button"
+                onClick={() => setActiveTab("payments")}
+                title="Payments"
+                className={`w-10 h-10 rounded-xl flex items-center justify-center transition-all ${
+                  activeTab === "payments"
+                    ? "bg-[#e11d48] text-white shadow-[0_4px_16px_rgba(225,29,72,0.45)]"
+                    : "text-slate-400 hover:text-white hover:bg-white/5"
+                }`}
+              >
+                <CreditCard className="w-4 h-4" />
+              </button>
+
+              {/* Notification */}
+              <button
+                type="button"
+                onClick={() => setActiveTab("notification")}
+                title="Notification"
+                className={`relative w-10 h-10 rounded-xl flex items-center justify-center transition-all ${
+                  activeTab === "notification"
+                    ? "bg-[#e11d48] text-white shadow-[0_4px_16px_rgba(225,29,72,0.45)]"
+                    : "text-slate-400 hover:text-white hover:bg-white/5"
+                }`}
+              >
+                <Bell className="w-4 h-4" />
+                <span className="absolute top-1.5 right-1.5 w-2 h-2 rounded-full bg-red-500 animate-pulse" />
+              </button>
+
+              {/* Settings */}
+              <button
+                type="button"
+                onClick={() => setActiveTab("settings")}
+                title="Settings"
+                className={`w-10 h-10 rounded-xl flex items-center justify-center transition-all ${
+                  activeTab === "settings"
+                    ? "bg-[#e11d48] text-white shadow-[0_4px_16px_rgba(225,29,72,0.45)]"
+                    : "text-slate-400 hover:text-white hover:bg-white/5"
+                }`}
+              >
+                <Settings className="w-4 h-4" />
+              </button>
+            </div>
+          </div>
+
+          {/* Bottom Logout for Mobile */}
+          <button
+            type="button"
+            onClick={logoutUser}
+            title="Log Out"
+            className="w-10 h-10 rounded-xl flex items-center justify-center text-rose-400 hover:bg-rose-950/40 hover:text-white transition-colors"
+          >
+            <LogOut className="w-4 h-4" />
+          </button>
+        </aside>
+
+        {/* ===================================================================
+            2. DESKTOP FULL LEFT SIDEBAR (Hidden on Mobile, Visible on lg+)
+           =================================================================== */}
+        <aside className="hidden lg:flex lg:w-60 xl:w-64 bg-[#16081e]/95 border-r border-[#2b0f38] p-4 sm:p-5 flex-col justify-between shrink-0">
           
           <div className="space-y-5">
             
@@ -618,7 +775,7 @@ export default function DashboardPage() {
           </div>
 
           {/* Sidebar Bottom: Log Out Button (Matching Reference Image) */}
-          <div className="pt-4 border-t border-[#2a0e35] mt-4 lg:mt-0">
+          <div className="pt-4 border-t border-[#2a0e35] mt-4">
             <button
               type="button"
               onClick={logoutUser}
@@ -632,23 +789,270 @@ export default function DashboardPage() {
         </aside>
 
         {/* ===================================================================
+            3. MOBILE SLIDE-OUT DRAWER OVERLAY (Triggered via Hamburger / Logo)
+           =================================================================== */}
+        {isMobileDrawerOpen && (
+          <div className="fixed inset-0 z-50 lg:hidden flex">
+            {/* Backdrop */}
+            <div 
+              className="fixed inset-0 bg-black/80 backdrop-blur-sm transition-opacity"
+              onClick={() => setIsMobileDrawerOpen(false)}
+            />
+
+            {/* Slide-out Menu Panel from Left */}
+            <div className="relative w-72 max-w-[85vw] bg-[#16081e] border-r border-[#2b0f38] p-5 shadow-2xl flex flex-col justify-between overflow-y-auto z-10 animate-in slide-in-from-left duration-200">
+              <div className="space-y-5">
+                {/* Header with Close Button */}
+                <div className="flex items-center justify-between pb-3 border-b border-[#2b0f38]">
+                  <div className="flex items-center gap-2.5">
+                    <div className="relative w-8 h-8 rounded-xl bg-gradient-to-br from-red-600/30 to-purple-900/40 border border-red-500/40 p-1 flex items-center justify-center shrink-0">
+                      <Image
+                        src="/assets/logo/florence-network-logo.png"
+                        alt="Florence Network"
+                        width={24}
+                        height={24}
+                        className="object-contain"
+                      />
+                    </div>
+                    <div>
+                      <span className="font-cinzel text-xs font-black tracking-wider text-white block">
+                        FLORENCE <span className="text-red-400">NET</span>
+                      </span>
+                      <span className="text-[8px] font-mono tracking-widest text-slate-400 uppercase block">
+                        CONSOLE MENU
+                      </span>
+                    </div>
+                  </div>
+
+                  <button
+                    type="button"
+                    onClick={() => setIsMobileDrawerOpen(false)}
+                    className="p-1.5 rounded-lg text-slate-400 hover:text-white hover:bg-white/10"
+                    title="Tutup Menu"
+                  >
+                    <X className="w-4 h-4" />
+                  </button>
+                </div>
+
+                {/* Nav Links in Drawer */}
+                <nav className="space-y-1 font-montserrat text-xs">
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setActiveTab("dashboard");
+                      setIsMobileDrawerOpen(false);
+                    }}
+                    className={`w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl font-bold transition-all ${
+                      activeTab === "dashboard"
+                        ? "bg-[#e11d48] text-white shadow-[0_4px_20px_rgba(225,29,72,0.45)]"
+                        : "text-slate-400 hover:text-white hover:bg-white/5"
+                    }`}
+                  >
+                    <LayoutDashboard className="w-4 h-4 shrink-0" />
+                    <span>My Dashboard</span>
+                  </button>
+
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setActiveTab("ranks");
+                      setIsMobileDrawerOpen(false);
+                    }}
+                    className={`w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl font-bold transition-all ${
+                      activeTab === "ranks"
+                        ? "bg-[#e11d48] text-white shadow-[0_4px_20px_rgba(225,29,72,0.45)]"
+                        : "text-slate-400 hover:text-white hover:bg-white/5"
+                    }`}
+                  >
+                    <Gamepad2 className="w-4 h-4 shrink-0" />
+                    <span>Game&apos;s List</span>
+                  </button>
+
+                  <Link
+                    href="/#katalog"
+                    onClick={() => setIsMobileDrawerOpen(false)}
+                    className="w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl font-bold text-slate-400 hover:text-white hover:bg-white/5 transition-all"
+                  >
+                    <ShoppingBag className="w-4 h-4 shrink-0" />
+                    <span>Explore Store</span>
+                  </Link>
+
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setActiveTab("purchased");
+                      setIsMobileDrawerOpen(false);
+                    }}
+                    className={`w-full flex items-center justify-between px-3.5 py-2.5 rounded-xl font-bold transition-all ${
+                      activeTab === "purchased"
+                        ? "bg-[#e11d48] text-white shadow-[0_4px_20px_rgba(225,29,72,0.45)]"
+                        : "text-slate-400 hover:text-white hover:bg-white/5"
+                    }`}
+                  >
+                    <div className="flex items-center gap-3">
+                      <Receipt className="w-4 h-4 shrink-0" />
+                      <span>Purchased</span>
+                    </div>
+                    {userOrders.length > 0 && (
+                      <span className="px-1.5 py-0.5 rounded-md bg-white/20 text-[9px] font-mono">
+                        {userOrders.length}
+                      </span>
+                    )}
+                  </button>
+
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setActiveTab("friends");
+                      setIsMobileDrawerOpen(false);
+                    }}
+                    className={`w-full flex items-center justify-between px-3.5 py-2.5 rounded-xl font-bold transition-all ${
+                      activeTab === "friends"
+                        ? "bg-[#e11d48] text-white shadow-[0_4px_20px_rgba(225,29,72,0.45)]"
+                        : "text-slate-400 hover:text-white hover:bg-white/5"
+                    }`}
+                  >
+                    <div className="flex items-center gap-3">
+                      <Users className="w-4 h-4 shrink-0" />
+                      <span>Friends</span>
+                    </div>
+                    <span className="px-1.5 py-0.5 rounded-md bg-emerald-500/20 text-emerald-300 text-[9px] font-mono">
+                      {OFFICIAL_WHITELIST.length}
+                    </span>
+                  </button>
+
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setActiveTab("payments");
+                      setIsMobileDrawerOpen(false);
+                    }}
+                    className={`w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl font-bold transition-all ${
+                      activeTab === "payments"
+                        ? "bg-[#e11d48] text-white shadow-[0_4px_20px_rgba(225,29,72,0.45)]"
+                        : "text-slate-400 hover:text-white hover:bg-white/5"
+                    }`}
+                  >
+                    <CreditCard className="w-4 h-4 shrink-0" />
+                    <span>Payments</span>
+                  </button>
+
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setActiveTab("notification");
+                      setIsMobileDrawerOpen(false);
+                    }}
+                    className={`w-full flex items-center justify-between px-3.5 py-2.5 rounded-xl font-bold transition-all ${
+                      activeTab === "notification"
+                        ? "bg-[#e11d48] text-white shadow-[0_4px_20px_rgba(225,29,72,0.45)]"
+                        : "text-slate-400 hover:text-white hover:bg-white/5"
+                    }`}
+                  >
+                    <div className="flex items-center gap-3">
+                      <Bell className="w-4 h-4 shrink-0" />
+                      <span>Notification</span>
+                    </div>
+                    <span className="w-2 h-2 rounded-full bg-red-500 animate-pulse" />
+                  </button>
+
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setActiveTab("settings");
+                      setIsMobileDrawerOpen(false);
+                    }}
+                    className={`w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl font-bold transition-all ${
+                      activeTab === "settings"
+                        ? "bg-[#e11d48] text-white shadow-[0_4px_20px_rgba(225,29,72,0.45)]"
+                        : "text-slate-400 hover:text-white hover:bg-white/5"
+                    }`}
+                  >
+                    <Settings className="w-4 h-4 shrink-0" />
+                    <span>Settings</span>
+                  </button>
+                </nav>
+
+                {/* Online Players inside drawer */}
+                <div className="pt-3 border-t border-[#2a0e35] space-y-2">
+                  <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">
+                    ONLINE PLAYERS ({OFFICIAL_WHITELIST.length})
+                  </span>
+                  <div className="space-y-1.5 max-h-40 overflow-y-auto">
+                    {[
+                      { name: "CelCelxyh", status: "Online" },
+                      { name: "Adyputra6", status: "In-Game" },
+                      { name: "Chyntia136", status: "Survival" },
+                      { name: "AmiiLunaa", status: "Lobby" }
+                    ].map((p, idx) => (
+                      <div 
+                        key={idx}
+                        className="flex items-center gap-2 px-2 py-1 rounded-lg hover:bg-white/5 transition-colors cursor-pointer"
+                        onClick={() => {
+                          setActiveTab("friends");
+                          setIsMobileDrawerOpen(false);
+                        }}
+                      >
+                        <div className="relative w-6 h-6 rounded-full overflow-hidden bg-slate-900 border border-slate-700 shrink-0">
+                          <Image
+                            src={`https://mc-heads.net/avatar/${p.name}/32`}
+                            alt={p.name}
+                            width={24}
+                            height={24}
+                            className="object-contain image-rendering-pixelated"
+                            unoptimized
+                          />
+                        </div>
+                        <span className="text-xs text-slate-200 truncate">{p.name}</span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              </div>
+
+              {/* Bottom Logout in Drawer */}
+              <div className="pt-4 border-t border-[#2a0e35]">
+                <button
+                  type="button"
+                  onClick={logoutUser}
+                  className="w-full flex items-center justify-center gap-2 py-2.5 px-4 rounded-xl bg-red-950/40 border border-red-500/40 text-rose-300 hover:text-white text-xs font-montserrat font-bold transition-all"
+                >
+                  <LogOut className="w-3.5 h-3.5" />
+                  <span>Log Out</span>
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* ===================================================================
             MAIN COCKPIT PANEL (HEADER, HERO BANNER, LIBRARY, YOU MIGHT LIKE)
            =================================================================== */}
-        <main className="flex-1 p-4 sm:p-6 lg:p-7 flex flex-col space-y-5 overflow-y-auto max-h-[96vh]">
+        <main className="flex-1 min-w-0 p-3 sm:p-5 lg:p-7 flex flex-col space-y-4 sm:space-y-5 overflow-y-auto max-h-[96vh]">
           
           {/* Top Bar: Search Bar, Bell, Profile Capsule, Settings (Exact Match to Image 1) */}
           <div className="flex flex-col sm:flex-row items-center justify-between gap-3">
             
-            {/* Search Input Bar (Matching Image 1: "Search for games...") */}
-            <div className="relative w-full sm:max-w-md">
-              <Search className="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2" />
-              <input
-                type="text"
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                placeholder="Search for games, ranks, perks..."
-                className="w-full bg-[#240e30]/80 border border-[#3e1951] rounded-2xl py-2 pl-10 pr-4 text-xs font-montserrat text-white placeholder-slate-400 focus:outline-none focus:border-red-500 transition-all shadow-inner"
-              />
+            {/* Search Input Bar with Mobile Menu Toggle */}
+            <div className="flex items-center gap-2 w-full sm:max-w-md">
+              <button
+                type="button"
+                onClick={() => setIsMobileDrawerOpen(true)}
+                className="lg:hidden p-2 rounded-xl bg-[#240e30]/80 border border-[#3e1951] text-slate-300 hover:text-white shrink-0"
+                title="Buka Menu Navigasi"
+              >
+                <Menu className="w-4 h-4" />
+              </button>
+              <div className="relative flex-1">
+                <Search className="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2" />
+                <input
+                  type="text"
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  placeholder="Search for games, ranks, perks..."
+                  className="w-full bg-[#240e30]/80 border border-[#3e1951] rounded-2xl py-2 pl-10 pr-4 text-xs font-montserrat text-white placeholder-slate-400 focus:outline-none focus:border-red-500 transition-all shadow-inner"
+                />
+              </div>
             </div>
 
             {/* Right Group: Bedrock IP Pill, Notification Bell, User Capsule, Settings */}
