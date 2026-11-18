@@ -251,6 +251,9 @@ export const CONFIG = {
   QRIS_NMID: "ID1025374342240",
   // Google Apps Script Web App Endpoint (Database Google Sheet Gratis)
   APPS_SCRIPT_URL: process.env.NEXT_PUBLIC_APPS_SCRIPT_URL || "",
+  GOOGLE_SPREADSHEET_URL: "https://docs.google.com/spreadsheets/d/1NVW_b4dHx-tcgtQE7A--ZR13S_l4RBgnmLbI8TG1sAQ/edit",
+  GOOGLE_DRIVE_URL: "https://drive.google.com/drive/folders/1ypqhwhsbmpxE7tNzIYt_7dN1WP8F512x",
+  GOOGLE_APPS_SCRIPT_URL: "https://script.google.com/u/0/home/projects/1k-0pbXoCTqAn0zaV2oi36iyByS7qqyh78NckjmGnorBJ9IJCqh2VZ-YB/edit",
   STATS: {
     onlineCount: "11/50",
     recordCount: "Rekor: 45 Online",

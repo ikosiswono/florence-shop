@@ -188,7 +188,7 @@ export default function AuthModal() {
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-black/85 backdrop-blur-md animate-fadeIn">
       {/* Modal Dialog Styled Exactly Like Reference Screenshot */}
-      <div className="bg-[#1e2126] text-white rounded-2xl max-w-lg w-full border border-slate-700/60 shadow-2xl overflow-hidden relative max-h-[94vh] flex flex-col font-sans">
+      <div className="bg-[#24272c] text-white rounded-2xl max-w-lg w-full border border-[#3b424e] shadow-2xl overflow-hidden relative max-h-[94vh] flex flex-col font-sans">
         
         {/* Close Button Top Right */}
         <button
@@ -198,44 +198,27 @@ export default function AuthModal() {
             setError(null);
             setGoogleStep(false);
           }}
-          className="absolute top-4 right-4 z-20 p-1.5 rounded-lg text-slate-400 hover:text-white hover:bg-slate-800 transition-colors"
+          className="absolute top-4 right-4 z-20 p-1.5 rounded-lg text-slate-400 hover:text-white hover:bg-slate-700/60 transition-colors"
           aria-label="Tutup Modal"
         >
           <X className="w-5 h-5" />
         </button>
 
         {/* Modal Scrollable Container */}
-        <div className="p-6 sm:p-8 overflow-y-auto space-y-5">
+        <div className="p-6 sm:p-8 overflow-y-auto space-y-4">
 
           {/* Header Section */}
           <div>
-            <h2 className="text-2xl sm:text-3xl font-extrabold text-white tracking-tight">
+            <h2 className="text-2xl sm:text-3xl font-black text-white tracking-tight">
               {googleStep ? "Hubungkan Akun Google" : authMode === "register" ? "Daftar" : "Masuk"}
             </h2>
-            <p className="text-sm text-slate-400 mt-1">
+            <p className="text-xs sm:text-sm text-slate-400 mt-1">
               {googleStep 
                 ? "Hubungkan Gamertag Minecraft Bedrock resmi Anda dengan Google."
                 : authMode === "register" 
                 ? "Masukkan informasi pendaftaran yang valid." 
                 : "Masukkan informasi akun Anda yang valid."}
             </p>
-
-            {/* In-Game Gamertag Badge & Skin Preview */}
-            <div className="mt-3.5 inline-flex items-center gap-2.5 px-3 py-1.5 rounded-xl bg-slate-800/80 border border-slate-700/80 text-xs">
-              <div className="w-6 h-6 rounded-lg overflow-hidden bg-slate-900 border border-amber-400/50 shrink-0">
-                <Image
-                  src={avatarPreview}
-                  alt="Minecraft Avatar"
-                  width={24}
-                  height={24}
-                  className="object-contain image-rendering-pixelated"
-                  unoptimized
-                />
-              </div>
-              <span className="text-slate-300 text-[11px]">
-                Skin Preview: <strong className="text-amber-300">{gamertag.trim() || "Steve (Bedrock)"}</strong>
-              </span>
-            </div>
 
             {/* Alert Message from Checkout Guard */}
             {authMessage && (
@@ -320,7 +303,7 @@ export default function AuthModal() {
                     value={fullName}
                     onChange={(e) => setFullName(e.target.value)}
                     placeholder="Nama lengkap"
-                    className="w-full bg-[#2a2f38] border border-slate-700 rounded-lg py-2.5 px-3.5 text-sm text-white placeholder-slate-400 focus:outline-none focus:border-amber-400 transition-colors"
+                    className="w-full bg-[#353a43] border border-[#49515d] rounded-lg py-2.5 px-3.5 text-sm text-white placeholder-slate-400 focus:outline-none focus:border-[#967751] transition-colors"
                   />
                 </div>
 
@@ -334,7 +317,7 @@ export default function AuthModal() {
                     value={gamertag}
                     onChange={(e) => setGamertag(e.target.value)}
                     placeholder="Username"
-                    className="w-full bg-[#2a2f38] border border-slate-700 rounded-lg py-2.5 px-3.5 text-sm text-white placeholder-slate-400 focus:outline-none focus:border-amber-400 transition-colors"
+                    className="w-full bg-[#353a43] border border-[#49515d] rounded-lg py-2.5 px-3.5 text-sm text-white placeholder-slate-400 focus:outline-none focus:border-[#967751] transition-colors"
                   />
                 </div>
               </div>
@@ -350,7 +333,7 @@ export default function AuthModal() {
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   placeholder="Alamat email"
-                  className="w-full bg-[#2a2f38] border border-slate-700 rounded-lg py-2.5 px-3.5 text-sm text-white placeholder-slate-400 focus:outline-none focus:border-amber-400 transition-colors"
+                  className="w-full bg-[#353a43] border border-[#49515d] rounded-lg py-2.5 px-3.5 text-sm text-white placeholder-slate-400 focus:outline-none focus:border-[#967751] transition-colors"
                 />
               </div>
 
@@ -359,9 +342,9 @@ export default function AuthModal() {
                 <label className="block text-xs font-semibold text-slate-200 mb-1.5">
                   Nomor whatsapp
                 </label>
-                <div className="flex rounded-lg overflow-hidden border border-slate-700 bg-[#2a2f38] focus-within:border-amber-400 transition-colors">
+                <div className="flex rounded-lg overflow-hidden border border-[#49515d] bg-[#353a43] focus-within:border-[#967751] transition-colors">
                   {/* Flag & Prefix Picker */}
-                  <div className="flex items-center gap-1.5 px-3 bg-[#242830] border-r border-slate-700 select-none shrink-0">
+                  <div className="flex items-center gap-1.5 px-3 bg-[#2d323b] border-r border-[#49515d] select-none shrink-0">
                     {/* Indonesian Flag Icon */}
                     <span className="text-base leading-none">🇮🇩</span>
                     <ChevronDown className="w-3.5 h-3.5 text-slate-400" />
@@ -373,7 +356,7 @@ export default function AuthModal() {
                     required
                     value={phone}
                     onChange={(e) => setPhone(e.target.value)}
-                    placeholder="81234567890"
+                    placeholder=""
                     className="flex-1 bg-transparent py-2.5 px-3.5 text-sm text-white placeholder-slate-400 focus:outline-none"
                   />
                 </div>
@@ -392,7 +375,7 @@ export default function AuthModal() {
                       value={password}
                       onChange={(e) => setPassword(e.target.value)}
                       placeholder="Kata sandi"
-                      className="w-full bg-[#2a2f38] border border-slate-700 rounded-lg py-2.5 pl-3.5 pr-10 text-sm text-white placeholder-slate-400 focus:outline-none focus:border-amber-400 transition-colors"
+                      className="w-full bg-[#353a43] border border-[#49515d] rounded-lg py-2.5 pl-3.5 pr-10 text-sm text-white placeholder-slate-400 focus:outline-none focus:border-[#967751] transition-colors"
                     />
                     <button
                       type="button"
@@ -416,7 +399,7 @@ export default function AuthModal() {
                       value={confirmPassword}
                       onChange={(e) => setConfirmPassword(e.target.value)}
                       placeholder="Konfirmasi kata sandi"
-                      className="w-full bg-[#2a2f38] border border-slate-700 rounded-lg py-2.5 pl-3.5 pr-10 text-sm text-white placeholder-slate-400 focus:outline-none focus:border-amber-400 transition-colors"
+                      className="w-full bg-[#353a43] border border-[#49515d] rounded-lg py-2.5 pl-3.5 pr-10 text-sm text-white placeholder-slate-400 focus:outline-none focus:border-[#967751] transition-colors"
                     />
                     <button
                       type="button"
@@ -456,8 +439,8 @@ export default function AuthModal() {
                 />
                 <label htmlFor="agreeTerms" className="text-xs text-slate-300 leading-relaxed cursor-pointer select-none">
                   Saya setuju dengan{" "}
-                  <span className="text-amber-400 hover:underline">Syarat dan Ketentuan</span> dan{" "}
-                  <span className="text-amber-400 hover:underline">Kebijakan Pribadi</span>.
+                  <span className="text-[#b38c5d] hover:underline font-medium">Syarat dan Ketentuan</span> dan{" "}
+                  <span className="text-[#b38c5d] hover:underline font-medium">Kebijakan Pribadi</span>.
                 </label>
               </div>
 
@@ -500,7 +483,7 @@ export default function AuthModal() {
                 <button
                   type="button"
                   onClick={handleRefreshCaptcha}
-                  className="w-12 h-12 rounded-lg bg-[#242830] border border-slate-700 flex items-center justify-center text-slate-300 hover:text-white hover:border-amber-400 transition-colors shrink-0"
+                  className="w-12 h-12 rounded-lg bg-[#2d323b] border border-[#49515d] flex items-center justify-center text-slate-300 hover:text-white hover:border-[#967751] transition-colors shrink-0"
                   title="Muat ulang Captcha"
                   aria-label="Muat ulang Captcha"
                 >
@@ -527,7 +510,7 @@ export default function AuthModal() {
                     setAuthMode("login");
                     setError(null);
                   }}
-                  className="text-amber-400 hover:text-amber-300 font-semibold hover:underline"
+                  className="text-[#b38c5d] hover:text-[#cbb085] font-semibold hover:underline"
                 >
                   Masuk
                 </button>
@@ -549,8 +532,8 @@ export default function AuthModal() {
                   required
                   value={gamertag}
                   onChange={(e) => setGamertag(e.target.value)}
-                  placeholder="Username / Gamertag Minecraft"
-                  className="w-full bg-[#2a2f38] border border-slate-700 rounded-lg py-2.5 px-3.5 text-sm text-white placeholder-slate-400 focus:outline-none focus:border-amber-400 transition-colors"
+                  placeholder="Username"
+                  className="w-full bg-[#353a43] border border-[#49515d] rounded-lg py-2.5 px-3.5 text-sm text-white placeholder-slate-400 focus:outline-none focus:border-[#967751] transition-colors"
                 />
               </div>
 
@@ -565,7 +548,7 @@ export default function AuthModal() {
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
                     placeholder="Kata sandi"
-                    className="w-full bg-[#2a2f38] border border-slate-700 rounded-lg py-2.5 pl-3.5 pr-10 text-sm text-white placeholder-slate-400 focus:outline-none focus:border-amber-400 transition-colors"
+                    className="w-full bg-[#353a43] border border-[#49515d] rounded-lg py-2.5 pl-3.5 pr-10 text-sm text-white placeholder-slate-400 focus:outline-none focus:border-[#967751] transition-colors"
                   />
                   <button
                     type="button"
@@ -593,7 +576,7 @@ export default function AuthModal() {
                   href={`https://wa.me/${CONFIG.ADMIN_WA}?text=Halo%20Admin%20Florence,%20saya%20butuh%20bantuan%20reset%20kata%20sandi%20akun.`}
                   target="_blank"
                   rel="noreferrer"
-                  className="text-amber-400 hover:text-amber-300 hover:underline"
+                  className="text-[#b38c5d] hover:text-[#cbb085] hover:underline"
                 >
                   Lupa kata sandi?
                 </a>
@@ -634,7 +617,7 @@ export default function AuthModal() {
                 <button
                   type="button"
                   onClick={handleRefreshCaptcha}
-                  className="w-12 h-12 rounded-lg bg-[#242830] border border-slate-700 flex items-center justify-center text-slate-300 hover:text-white hover:border-amber-400 transition-colors shrink-0"
+                  className="w-12 h-12 rounded-lg bg-[#2d323b] border border-[#49515d] flex items-center justify-center text-slate-300 hover:text-white hover:border-[#967751] transition-colors shrink-0"
                   title="Muat ulang Captcha"
                   aria-label="Muat ulang Captcha"
                 >
@@ -661,7 +644,7 @@ export default function AuthModal() {
                     setAuthMode("register");
                     setError(null);
                   }}
-                  className="text-amber-400 hover:text-amber-300 font-semibold hover:underline"
+                  className="text-[#b38c5d] hover:text-[#cbb085] font-semibold hover:underline"
                 >
                   Daftar
                 </button>
