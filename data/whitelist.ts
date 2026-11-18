@@ -1,8 +1,8 @@
 /**
  * DAFTAR RESMI GAMERTAG MINECRAFT BEDROCK (WHITELIST SYSTEM)
  * -------------------------------------------------------------
- * Anda dapat menambahkan nama-nama pemain yang sah di sini.
- * Hanya Gamertag yang terdaftar yang dapat melakukan registrasi akun di Web Store.
+ * Hanya Gamertag resmi yang terdaftar di bawah ini yang diizinkan untuk
+ * membuat akun dan menentukan password sendiri di Web Store Florence Network.
  */
 
 export interface WhitelistEntry {
@@ -11,18 +11,56 @@ export interface WhitelistEntry {
   notes?: string;
 }
 
-// Daftar Gamertag Pemain yang Sah (Whitelist Resmi Server)
-// Nama-nama yang Anda kirimkan akan disusun dan ditambahkan di sini.
+// Daftar Gamertag Pemain yang Sah (Whitelist Resmi Server Florence Network)
 export const AUTHORIZED_GAMERTAGS: WhitelistEntry[] = [
-  // Server Founders & Admins
-  { gamertag: "ikosiswono", role: "owner", notes: "Owner Florence Network" },
-  { gamertag: "FlorenceAdmin", role: "admin", notes: "Admin Florence Network" }
-  // >> Nama-nama pemain baru dari Anda akan dimasukkan di sini <<
+  // Server Leadership & Administration
+  { gamertag: "ikosiswono", role: "owner", notes: "Server Owner" },
+  { gamertag: "FlorenceAdmin", role: "admin", notes: "Server Administrator" },
+
+  // Daftar Resmi 40 Pemain Terverifikasi
+  { gamertag: "Adyputra6", role: "member" },
+  { gamertag: "AmiiLunaa", role: "member" },
+  { gamertag: "arvans29", role: "member" },
+  { gamertag: "Awaaadesu3", role: "member" },
+  { gamertag: "Baimmenkaaaa", role: "member" },
+  { gamertag: "CelCelxyh", role: "member" },
+  { gamertag: "Chyntia136", role: "member" },
+  { gamertag: "Daifukiro0", role: "member" },
+  { gamertag: "Dennnzi14", role: "member" },
+  { gamertag: "Drikzz223", role: "member" },
+  { gamertag: "Finaxn", role: "member" },
+  { gamertag: "Gerykzz", role: "member" },
+  { gamertag: "gilenlavv", role: "member" },
+  { gamertag: "ItsMikaellaa", role: "member" },
+  { gamertag: "itsmolor", role: "member" },
+  { gamertag: "ItzNawirMc", role: "member" },
+  { gamertag: "JustVnite", role: "member" },
+  { gamertag: "Kazzuya2007", role: "member" },
+  { gamertag: "KHOIRULLLGMG", role: "member" },
+  { gamertag: "kinicth", role: "member" },
+  { gamertag: "kiyoomii1769", role: "member" },
+  { gamertag: "leaaa2553", role: "member" },
+  { gamertag: "MANTAPMEN3", role: "member" },
+  { gamertag: "meliaaa syududu", role: "member" },
+  { gamertag: "millooouuu", role: "member" },
+  { gamertag: "mrayzyou", role: "member" },
+  { gamertag: "N D Skyline9925", role: "member" },
+  { gamertag: "PudingBeku", role: "member" },
+  { gamertag: "QueennnzMe19", role: "member" },
+  { gamertag: "Ryuuenzi", role: "member" },
+  { gamertag: "Sinzznex1", role: "member" },
+  { gamertag: "Skeepy6025", role: "member" },
+  { gamertag: "Sunny4462", role: "member" },
+  { gamertag: "syududu", role: "member" },
+  { gamertag: "Tinus3541", role: "member" },
+  { gamertag: "TN12 12 12 12", role: "member" },
+  { gamertag: "Toorden", role: "member" },
+  { gamertag: "Xanzkc", role: "member" },
+  { gamertag: "ZeroMercy", role: "member" },
+  { gamertag: "ZYiiL13", role: "member" }
 ];
 
-// Opsi Mode Whitelist:
-// Jika "STRICT", hanya nama yang tertera di AUTHORIZED_GAMERTAGS yang boleh registrasi.
-// Jika "FLEXIBLE", format Gamertag Bedrock (3-16 karakter) diperbolehkan registrasi mandiri.
+// Mode Whitelist: "STRICT" = Hanya nama yang terdaftar di atas yang dapat mendaftar.
 export const WHITELIST_MODE: "STRICT" | "FLEXIBLE" = "STRICT";
 
 /**
@@ -35,14 +73,14 @@ export function checkGamertagAuthorization(gamertag: string): {
 } {
   const clean = gamertag.trim();
   
-  if (!clean || clean.length < 3 || clean.length > 16) {
+  if (!clean || clean.length < 3 || clean.length > 20) {
     return {
       allowed: false,
-      reason: "Gamertag Minecraft Bedrock harus terdiri dari 3 hingga 16 karakter."
+      reason: "Gamertag Minecraft Bedrock harus terdiri dari minimal 3 karakter."
     };
   }
 
-  // Format valid Xbox Live Bedrock Gamertag (huruf, angka, garis bawah, dan spasi tunggal)
+  // Format valid Xbox Live Bedrock Gamertag (huruf, angka, garis bawah, dan spasi)
   const bedrockRegex = /^[a-zA-Z0-9_ ]+$/;
   if (!bedrockRegex.test(clean)) {
     return {
@@ -59,7 +97,7 @@ export function checkGamertagAuthorization(gamertag: string): {
     if (!found) {
       return {
         allowed: false,
-        reason: `Gamertag "${clean}" belum terdaftar di whitelist resmi server. Hubungi Admin Florence Network untuk mendaftarkan nama akun Anda ke sistem whitelist.`
+        reason: `Gamertag "${clean}" tidak terdaftar di whitelist resmi server. Pastikan nama Gamertag sesuai dengan daftar sah Florence Network.`
       };
     }
   }
