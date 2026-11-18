@@ -250,7 +250,7 @@ export const CONFIG = {
   QRIS_MERCHANT_NAME: "ETERNALSMP, ID",
   QRIS_NMID: "ID1025374342240",
   // Google Apps Script Web App Endpoint (Database Google Sheet Gratis)
-  APPS_SCRIPT_URL: process.env.NEXT_PUBLIC_APPS_SCRIPT_URL || "",
+  APPS_SCRIPT_URL: process.env.NEXT_PUBLIC_APPS_SCRIPT_URL || "https://script.google.com/macros/s/AKfycbzI7fGvO0WWVtIQFlnOSp5z6xOgDF2p3eZ_sJCqSwC5Ko6-8gT96dvm9dn3p3RmvHLt/exec",
   GOOGLE_SPREADSHEET_URL: "https://docs.google.com/spreadsheets/d/1NVW_b4dHx-tcgtQE7A--ZR13S_l4RBgnmLbI8TG1sAQ/edit",
   GOOGLE_DRIVE_URL: "https://drive.google.com/drive/folders/1ypqhwhsbmpxE7tNzIYt_7dN1WP8F512x",
   GOOGLE_APPS_SCRIPT_URL: "https://script.google.com/u/0/home/projects/1k-0pbXoCTqAn0zaV2oi36iyByS7qqyh78NckjmGnorBJ9IJCqh2VZ-YB/edit",
